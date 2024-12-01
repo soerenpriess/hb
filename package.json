@@ -32,6 +32,8 @@
     "animejs": "^2.0.1",
     "aphrodite": "^1.1.0",
     "color": "^1.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "store": "^2.0.4"

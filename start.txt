@@ -1,0 +1,7 @@
+npm install
+
+yarn
+
+"scripts": {
+  "dev-server": "set DEV_SERVER=true && webpack-dev-server --hot --inline --progress"
+}

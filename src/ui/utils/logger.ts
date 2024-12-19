@@ -1,18 +1,19 @@
 interface LogEntry {
-    title: string;
-    text: string;
+    faction: string;
+    event: string;
+    action: string;
     timestamp: string;
 }
 
 class Logger {
     private logs: LogEntry[] = [];
 
-    public async log(title: string, text: string): Promise<void> {
+    public async log(faction: string, event: string, action: string): Promise<void> {
         const timestamp = new Date().toISOString();
-        const logEntry: LogEntry = { title, text, timestamp };
+        const logEntry: LogEntry = { faction, event, action, timestamp };
         this.logs.push(logEntry);
 
-        const logString = `[${timestamp}] ${title}: ${text}`;
+        const logString = `${faction}:${event}:${action}:${timestamp}`;
         console.log(logString);
 
         try {
@@ -21,7 +22,7 @@ class Logger {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ title, text }),
+                body: JSON.stringify({ faction, event, action, timestamp }),
             });
 
             if (!response.ok) {

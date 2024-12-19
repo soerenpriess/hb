@@ -202,6 +202,9 @@ export default function Sidebar({ store }: IProps) {
       <div className={css(styles.endTurnButton)} onClick={store.endTurn}>
         End Turn
       </div>
+      <div className={css(styles.endTurnButton)} onClick={store.test}>
+        Test
+      </div>
     </Layout>
   )
 }

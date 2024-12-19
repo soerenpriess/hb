@@ -4,11 +4,13 @@ import Hex from '../../engine/hex'
 import { ICell } from '../../engine/map'
 import Unit from '../../engine/unit'
 import BaseStore from '../utils/Store'
+import logger from '../utils/logger'
+import manipulateGame from '../utils/manipulateGame'
 
 import { IState } from './index'
 
 export default class Store extends BaseStore<IState> {
-  indexCells(hexes: Hex[]): {[idx: string]: Hex} {
+  indexCells(hexes: Hex[]): { [idx: string]: Hex } {
     const index = {}
     hexes.forEach(h => index[h.toString()] = h)
     return index
@@ -76,13 +78,30 @@ export default class Store extends BaseStore<IState> {
     this.set({ selection, hover: this.getCellInfo(cell) })
   }
 
+  test = async () => {
+    const { game } = this.state
+
+    console.log('game', game)
+    console.log("testo", await manipulateGame.getUnitsByFaction(game, '1'))
+    console.log("testo", await manipulateGame.increaseDamageOfUnitsFromFaction(game, '1', 100))
+    await manipulateGame.increaseMovementPointsOfUnitsFromFaction(game, '1', 3)
+  }
+
   endTurn = async () => {
     const { game } = this.state
+
+    let currentFactionName = game.currenFaction.id === this.state.playerFaction ? "Player" : "Ai"
+
+    // logger.log("EndTurn", "Ending turn for " + currentFactionName)
+
     await game.endTurn()
     this.set({
       selection: undefined,
       hover: undefined,
     })
+
+    currentFactionName = game.currenFaction.id === this.state.playerFaction ? "Player" : "Ai"
+    // logger.log("StartTurn", "Starting turn for " + currentFactionName)
 
     const currentFactionId = game.currenFaction.id
     if (currentFactionId !== this.state.playerFaction) {

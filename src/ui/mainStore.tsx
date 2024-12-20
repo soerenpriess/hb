@@ -7,6 +7,8 @@ import { debug } from '../utils'
 import * as storage from './storage'
 import Store from './utils/Store'
 
+import logger from './utils/logger'
+
 export interface IState {
   levelReached: number,
   party: IUnitType[]
@@ -32,7 +34,16 @@ export default class MainStore extends Store<IState> {
         levelReached: level + 1,
         currentGame: undefined,
       }, this.save)
+      logger.log("System", "Win", game.currenFaction.id)
+      logger.log("System", "Loose", Array.from(game.factions.values()).filter(f => f.id !== game.currenFaction.id)[0].id)
+      logger.log("System", "Round" + level.toString(), "End")
+      logger.log("System", "Reward", reward.toString())
     } else {
+      const { currentGame } = this.state
+      const { game, level } = currentGame!
+      logger.log("System", "Win", game.currenFaction.id)
+      logger.log("System", "Loose", Array.from(game.factions.values()).filter(f => f.id !== game.currenFaction.id)[0].id)
+      logger.log("System", "Round" + level.toString(), "End")
       this.set({ currentGame: undefined })
     }
 
@@ -41,6 +52,7 @@ export default class MainStore extends Store<IState> {
 
   startGame(level: number) {
     debug('mainStore: starting new game')
+    logger.log("System", "Round" + level.toString(), "Start")
     const levelDef = generateLevel(level)
     const game = createLevel(levelDef, this.state.party)
     this.set({
@@ -56,14 +68,17 @@ export default class MainStore extends Store<IState> {
 
   purchase = (cart: IUnitType[], cost: number) => {
     debug('mainStore: purchased', cart, 'for', cost)
+    logger.log("1", "purchased", cart[0].name)
     this.set({
       money: this.state.money - cost,
       party: [...this.state.party, ...cart],
     }, this.save)
+    logger.log("System", "MoneyLeft", (this.state.money - cost).toString())
   }
 
   resetProgress = () => {
     debug('mainStore: resetting progress')
+    logger.log("System", "Game", "ResetProgress")
     storage.reset()
     this.set(this.loadProgress())
   }

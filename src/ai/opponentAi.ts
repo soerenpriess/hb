@@ -4,6 +4,8 @@ import Store from '../ui/stageView/store'
 import { debug, intervalForeach } from '../utils'
 import UnitAi from './unitAi'
 
+import logger from '../ui/utils/logger'
+
 /**
  * the main strategy for the opponent is to move each unit, and if possible
  * execute an action
@@ -36,20 +38,22 @@ export default class OpponentAi {
       .some(this.hasCellEnemyUnit)
   }
 
-  async tryExecuteUnitAction(unit: Unit, action: (() => Promise<any>) | null) {
+  async tryExecuteUnitAction(unit: Unit, action: (() => Promise<any>) | null, actionName?: string | null) {
     this.update()
     if (action && unit.canPerformAction) {
+      const { id } = this.store.state.game.currenFaction
+      if (actionName) logger.log(id, 'Executing action', actionName)
       await action()
     }
     this.update()
   }
 
   moveUnit = async (unit: Unit) => {
-    debug('ai: moving unit', unit)
+    debug('Ai: moving unit', unit)
     const { game } = this.store.state
     const unitAi = new UnitAi(unit, game.map, this)
 
-    await this.tryExecuteUnitAction(unit, unitAi.getAction())
+    await this.tryExecuteUnitAction(unit, unitAi.getAction(), unitAi.getActionName())
 
     for (const p of unitAi.findPath()) {
       // we have to recompute the move targets every cycle because stuff
@@ -58,14 +62,17 @@ export default class OpponentAi {
 
       if (!(moveTargets.some(h => h.toString() === p.toString()))) {
         debug('ai: reached final position', p)
+        // const pX = p._q
+        // const pY = p._r
+        // logger.log('Ai', `Moving unit ${unit.type.name} from ${unitBasePosition} to ${pX - 1},${pY}`);
         break
       }
       await unit.move(p)
 
-      await this.tryExecuteUnitAction(unit, unitAi.getAction())
+      await this.tryExecuteUnitAction(unit, unitAi.getAction(), unitAi.getActionName())
     }
 
-    await this.tryExecuteUnitAction(unit, unitAi.getLastAction())
+    await this.tryExecuteUnitAction(unit, unitAi.getLastAction(), unitAi.getActionName())
 
     this.update()
   }

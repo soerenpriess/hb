@@ -16,11 +16,13 @@ export interface IThing {
   id: string
 
   pos: Hex
+
+  actions: any[]
 }
 
 export default class Thing implements IThing {
   kind: string
   id = gid()
-
   pos: Hex
+  actions: any[]
 }

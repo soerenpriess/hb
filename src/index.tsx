@@ -8,4 +8,4 @@ const app = <App />
 
 ReactDOM.render(app, document.getElementById('app')!)
 
-logger.log('Start', 'App gestartet');
+logger.log('System', 'Game', 'Start');

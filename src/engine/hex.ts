@@ -11,7 +11,7 @@ import assert from './assert'
 
 export default class Hex {
   private _repr: string
-  constructor(private _q: number, private _r: number) {
+  constructor(public _q: number, public _r: number) {
     this._repr = `${this.q},${this.r}`
   }
 
@@ -58,8 +58,8 @@ export default class Hex {
   }
 
   distance(from: Hex) {
-     const sub = this.sub(from)
-     return Math.max(Math.abs(sub.q), Math.abs(sub.r), Math.abs(sub.s))
+    const sub = this.sub(from)
+    return Math.max(Math.abs(sub.q), Math.abs(sub.r), Math.abs(sub.s))
   }
 
   circle(radius: number) {

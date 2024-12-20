@@ -92,6 +92,27 @@ export default class UnitAi {
     return null
   }
 
+  getActionName(last = false): string | null {
+    let bestAction: IActionScore = {
+      score: 0,
+    }
+
+    for (const action of this.unit.actions) {
+      for (const target of action.targets()) {
+        const score = this.rankAction(action.performAction(target), last)
+        if (score > bestAction.score) {
+          bestAction = { score, action, target }
+        }
+      }
+    }
+
+    if (bestAction.action) {
+      return bestAction.action.name
+    }
+
+    return null
+  }
+
   getLastAction(): (() => Promise<any>) | null {
     // XXX consider removing this
     return this.getAction(true)

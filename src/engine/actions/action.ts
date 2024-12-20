@@ -1,3 +1,4 @@
+import logger from '../../ui/utils/logger'
 import Game from '../game'
 import Hex from '../hex'
 import Unit, { UnitStatus } from '../unit'
@@ -58,6 +59,8 @@ export class UnitAction implements IAction {
       const targetUnit = this.game.things.get(t.unitId) as Unit
       if (t.damage) {
         await targetUnit.takeDamage(t.damage)
+        const targetFaction = Array.from(this.game.factions.values()).filter((f: Faction) => f.id !== this.game.currenFaction.id)[0]
+        logger.log(targetFaction.id, "TakeDamage", targetUnit.type.name)
       }
       if (t.status) {
         await targetUnit.alterStatus(t.status.status, t.status.exp)

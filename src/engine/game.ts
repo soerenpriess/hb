@@ -25,7 +25,7 @@ export default class Game {
 
   map: IMap
 
-  private subs: {[idx: string]: Array<(payload) => Promise<void>>} = {}
+  private subs: { [idx: string]: Array<(payload) => Promise<void>> } = {}
 
   constructor({ factions, map }: IGameConfig) {
     this.map = map
@@ -42,8 +42,8 @@ export default class Game {
     return Array.from(this.factions.values())[this.currentFactionIndex]
   }
 
-  get factionUnits(): {[idx: string]: Unit[]} {
-    const units: {[idx: string]: Unit[]} = {}
+  get factionUnits(): { [idx: string]: Unit[] } {
+    const units: { [idx: string]: Unit[] } = {}
 
     this.factions.forEach(f => units[f.id] = [])
     this.things.forEach(t => {

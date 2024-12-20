@@ -35,6 +35,7 @@ export default class Store extends BaseStore<IState> {
 
     let newSelection
     if (action && action.targets[cell.pos.toString()]) {
+      logger.log(this.state.game.currenFaction.id, "ExecuteAction", action.action.name)
       await action.action.execute(cell.pos)
     } else if (
       !action && unit && unit.unit.factionId === playerFaction
@@ -51,10 +52,14 @@ export default class Store extends BaseStore<IState> {
 
   selectAction = (action: UnitAction) => {
     const { selection } = this.state
+    const { game } = this.state
+
     selection!.unit!.action = {
       action,
       targets: this.indexCells(action.targets()),
     }
+
+    logger.log(game.currenFaction.id, "SelectAction", action.name)
 
     this.set({ selection, hover: undefined })
   }
@@ -89,10 +94,7 @@ export default class Store extends BaseStore<IState> {
 
   endTurn = async () => {
     const { game } = this.state
-
-    let currentFactionName = game.currenFaction.id === this.state.playerFaction ? "Player" : "Ai"
-
-    // logger.log("EndTurn", "Ending turn for " + currentFactionName)
+    logger.log("System", "EndTurn", game.currenFaction.id)
 
     await game.endTurn()
     this.set({
@@ -100,8 +102,7 @@ export default class Store extends BaseStore<IState> {
       hover: undefined,
     })
 
-    currentFactionName = game.currenFaction.id === this.state.playerFaction ? "Player" : "Ai"
-    // logger.log("StartTurn", "Starting turn for " + currentFactionName)
+    logger.log("System", "StartTurn", game.currenFaction.id)
 
     const currentFactionId = game.currenFaction.id
     if (currentFactionId !== this.state.playerFaction) {

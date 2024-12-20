@@ -146,11 +146,11 @@ export default class Stageview extends React.Component<IProps, IState> {
           <div className={css(styles.mapContainer)}>
             <svg ref="svg" onMouseOut={() => this.store.hover(null)}>
               <g ref="map">
-                <Map store={this.store} />
+                <Map store={this.store} /> {/*Map*/}
               </g>
               <g style={{ pointerEvents: 'none' }}>
-                <Overlays store={this.store} />
-                <Things store={this.store} />
+                <Overlays store={this.store} /> {/*Angriff zonen oder move zonen*/}
+                <Things store={this.store} /> {/*Einheiten*/}
               </g>
             </svg>
           </div>

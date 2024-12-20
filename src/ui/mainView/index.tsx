@@ -124,9 +124,9 @@ export default class MainView extends React.Component<IProps, IState> {
         >
           Help
         </h2>
-        <h2 onClick={store.resetProgress} className={css(styles.button)}>
+        {/* <h2 onClick={store.resetProgress} className={css(styles.button)}>
           Reset Progress
-        </h2>
+        </h2> */}
       </Screen>
     )
   }

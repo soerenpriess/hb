@@ -16,8 +16,10 @@ class Logger {
         const logString = `${faction}:${event}:${action}:${timestamp}`;
         console.log(logString);
 
+        const subject_alias = window.REACT_APP_SUBJECT_ALIAS
+
         try {
-            const response = await fetch('http://localhost:3001/log', {
+            const response = await fetch(`http://localhost:3001/log?subject_alias=${subject_alias}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

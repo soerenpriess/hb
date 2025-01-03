@@ -1,2 +1,49 @@
-System:Game:Start:2024-12-19T16:27:30.895Z
-System:Round4:Start:2024-12-19T16:27:32.114Z
+System:Game:Start:2024-12-20T16:11:41.179Z
+1:purchased:Horseman:2024-12-20T16:11:49.949Z
+System:MoneyLeft:3:2024-12-20T16:11:49.949Z
+System:Round4:Start:2024-12-20T16:11:55.011Z
+1:SelectAction:Ranged Attack:2024-12-20T16:12:06.652Z
+1:ExecuteAction:Ranged Attack:2024-12-20T16:12:07.517Z
+2:TakeDamage:Orc Archer:2024-12-20T16:12:09.105Z
+1:SelectAction:Stone Throw:2024-12-20T16:12:21.214Z
+1:ExecuteAction:Stone Throw:2024-12-20T16:12:23.256Z
+2:TakeDamage:Orc Archer:2024-12-20T16:12:24.821Z
+System:EndTurn:1:2024-12-20T16:12:30.551Z
+System:StartTurn:2:2024-12-20T16:12:30.553Z
+2:Executing action:Web:2024-12-20T16:12:34.922Z
+1:TakeDamage:Warrior:2024-12-20T16:12:36.520Z
+System:EndTurn:2:2024-12-20T16:12:36.525Z
+System:StartTurn:1:2024-12-20T16:12:36.527Z
+1:SelectAction:Ranged Attack:2024-12-20T16:12:52.662Z
+1:ExecuteAction:Ranged Attack:2024-12-20T16:12:54.388Z
+2:TakeDamage:Troll:2024-12-20T16:12:55.953Z
+1:SelectAction:Stone Throw:2024-12-20T16:13:00.313Z
+1:ExecuteAction:Stone Throw:2024-12-20T16:13:04.390Z
+2:TakeDamage:Troll:2024-12-20T16:13:05.969Z
+2:TakeDamage:Bat:2024-12-20T16:13:05.969Z
+2:TakeDamage:Orc:2024-12-20T16:13:05.986Z
+2:TakeDamage:Bat:2024-12-20T16:13:06.002Z
+1:SelectAction:Guard:2024-12-20T16:13:24.528Z
+1:ExecuteAction:Guard:2024-12-20T16:13:26.072Z
+System:EndTurn:1:2024-12-20T16:13:31.157Z
+System:StartTurn:2:2024-12-20T16:13:31.159Z
+2:Executing action:Melee Attack:2024-12-20T16:13:31.619Z
+1:TakeDamage:Warrior:2024-12-20T16:13:33.201Z
+2:Executing action:Melee Attack:2024-12-20T16:13:34.303Z
+1:TakeDamage:Warrior:2024-12-20T16:13:35.867Z
+2:Executing action:Web:2024-12-20T16:13:38.201Z
+1:TakeDamage:Warrior:2024-12-20T16:13:39.801Z
+System:EndTurn:2:2024-12-20T16:13:39.807Z
+System:StartTurn:1:2024-12-20T16:13:39.809Z
+1:SelectAction:Ranged Attack:2024-12-20T16:13:48.449Z
+1:ExecuteAction:Ranged Attack:2024-12-20T16:13:49.340Z
+2:TakeDamage:Bat:2024-12-20T16:13:50.900Z
+1:SelectAction:Melee Attack:2024-12-20T16:13:52.573Z
+1:ExecuteAction:Melee Attack:2024-12-20T16:13:53.317Z
+2:TakeDamage:Bat:2024-12-20T16:13:54.883Z
+1:SelectAction:Stone Throw:2024-12-20T16:13:56.676Z
+1:ExecuteAction:Stone Throw:2024-12-20T16:14:00.168Z
+2:TakeDamage:Bat:2024-12-20T16:14:01.716Z
+2:TakeDamage:Orc:2024-12-20T16:14:01.717Z
+2:TakeDamage:Bat:2024-12-20T16:14:01.733Z
+System:Game:Start:2024-12-20T16:14:05.143Z

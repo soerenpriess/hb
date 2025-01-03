@@ -12,8 +12,9 @@ app.use(express.json());
 app.post('/log', (req, res) => {
     const { faction, event, action, timestamp } = req.body;
     const logEntry = `${faction}:${event}:${action}:${timestamp}\n`;
+    const subject_alias = req.query.subject_alias;
 
-    fs.appendFile('logs.txt', logEntry, (err) => {
+    fs.appendFile(`${subject_alias}_logs.txt`, logEntry, (err) => {
         if (err) {
             console.error('Fehler beim Schreiben des Logs:', err);
             res.status(500).send('Fehler beim Loggen');

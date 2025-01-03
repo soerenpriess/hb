@@ -67,10 +67,17 @@ function pickOpponents(value: number, bag: IUnitType[] = []): IUnitType[] {
  * - map_size: Max(Floor(5 + (N / 3)), 10)
  */
 export function generateLevel(number): ILevelDefinition {
-  const enemyValue = STARTING_ENEMY_VALUE + number * 10
+  const enemyValue = STARTING_ENEMY_VALUE + number * 10 // level 1 = 10 + 0 * 10 = 10, level 2 = 10 + 1 * 10 = 20, level 3 = 10 + 2 * 10 = 30, ...
   const reward = Math.floor(enemyValue * Math.max(20 - number, 1) / 70)
   const mapSize = Math.min(MIN_MAP_SIZE + Math.floor(number / 3), MAX_MAP_SIZE)
   const pits = Math.floor(cellsInMap(mapSize) * 0.2)
+
+  console.log("generateLevel", {
+    "ememyValue": enemyValue,
+    "reward": reward,
+    "mapSize": mapSize,
+    "pits": pits
+  })
 
   return {
     map: {

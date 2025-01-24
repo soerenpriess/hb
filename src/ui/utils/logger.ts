@@ -9,7 +9,8 @@ class Logger {
     private logs: LogEntry[] = [];
 
     public async log(faction: string, event: string, action: string): Promise<void> {
-        const timestamp = new Date().toISOString();
+        const raw_timestamp = new Date()
+        const timestamp = formatDateTime(raw_timestamp);
         const logEntry: LogEntry = { faction, event, action, timestamp };
         this.logs.push(logEntry);
 
@@ -34,6 +35,19 @@ class Logger {
             console.error('Fehler beim Loggen:', error);
         }
     }
+}
+
+function formatDateTime(date) {
+    const pad = (num) => num.toString().padStart(2, '0');
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 const logger = new Logger();

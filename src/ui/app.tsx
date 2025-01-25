@@ -1,6 +1,7 @@
 import { css, StyleSheet } from 'aphrodite'
 import * as React from 'react'
 
+import { sendTelegramMessage } from './telegramBot'
 import MainStore, { IState } from './mainStore'
 import MainView from './mainView'
 import StageView from './stageView'
@@ -15,6 +16,17 @@ const styles = StyleSheet.create({
     overflow: 'auto',
     background: style.darkGrey,
     color: style.textColor,
+  },
+  button: {
+    position: 'fixed',
+    top: '10px',
+    right: '10px',
+    padding: '10px',
+    background: style.darkGrey,
+    color: style.textColor,
+    border: 'none',
+    cursor: 'pointer',
+    zIndex: 1000,
   },
 })
 
@@ -36,9 +48,31 @@ export default class App extends React.Component<{}, IState> {
     return <MainView store={this.store} />
   }
 
+  sendMessage = async () => {
+    try {
+          alert('Der Prüfer wirde informiert und kommt in Kürze')
+          const response = await fetch(`http://localhost:3001/telegram`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: 'Proband benötigt Hilfe in der Testkabine' }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Fehler beim Senden der Telegram nachricht an den Server');
+            }
+        } catch (error) {
+            console.error('Fehler bei telegram:', error);
+        }
+  }
+
   render() {
     return (
       <div className={css(styles.main)}>
+        <button className={css(styles.button)} onClick={this.sendMessage}>
+          Prüfer holen
+        </button>
         {this.router()}
       </div>
     )

@@ -1,7 +1,10 @@
 const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
-const { time } = require('console');
+const TelegramBot = require('node-telegram-bot-api');
+
+const token = '8109377544:AAFBr8kOqBDS_dgd95fc2s-So5EkYXzHhfs';
+const bot = new TelegramBot(token, { polling: true });
 
 const app = express();
 const port = 3001;
@@ -22,6 +25,11 @@ app.post('/log', (req, res) => {
             res.status(200).send('Log erfolgreich gespeichert');
         }
     });
+});
+
+app.post('/telegram', (req, res) => {
+    const chatId = '1741377810'; // Ersetzen Sie dies durch Ihre Chat-ID
+    bot.sendMessage(chatId, "Proband benötigt Hilfe in der Testkabine");
 });
 
 app.listen(port, () => {

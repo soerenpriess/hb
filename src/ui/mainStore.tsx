@@ -76,12 +76,15 @@ export default class MainStore extends Store<IState> {
     logger.log("System", "MoneyLeft", (this.state.money - cost).toString())
   }
 
-  resetProgress = () => {
+resetProgress = () => {
+  if (confirm("Möchten Sie wirklich Ihren Fortschritt zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.")) {
     debug('mainStore: resetting progress')
     logger.log("System", "Game", "ResetProgress")
     storage.reset()
     this.set(this.loadProgress())
   }
+}
+
 
   loadProgress = () => {
     return storage.load() || this.getInitialState()

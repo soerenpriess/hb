@@ -17,6 +17,8 @@ const subjectAlias = urlParams.get('subject_alias');
 // Setzen Sie den Wert im window-Objekt
 window.REACT_APP_SUBJECT_ALIAS = subjectAlias || "null";
 
+localStorage.removeItem('hb:gameState');
+
 const app = <App />
 
 ReactDOM.render(app, document.getElementById('app')!)

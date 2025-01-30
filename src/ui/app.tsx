@@ -1,7 +1,5 @@
 import { css, StyleSheet } from 'aphrodite'
 import * as React from 'react'
-
-import { sendTelegramMessage } from './telegramBot'
 import MainStore, { IState } from './mainStore'
 import MainView from './mainView'
 import StageView from './stageView'
@@ -50,7 +48,7 @@ export default class App extends React.Component<{}, IState> {
 
   sendMessage = async () => {
     try {
-          alert('Der Prüfer wirde informiert und kommt in Kürze')
+          alert('Der Prüfer wurde informiert und erscheint in Kürze')
           const response = await fetch(`http://localhost:3001/telegram`, {
                 method: 'POST',
                 headers: {

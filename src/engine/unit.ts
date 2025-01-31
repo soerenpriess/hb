@@ -99,13 +99,13 @@ export default class Unit extends Thing {
 
   async takeDamage(damage: number) {
     if (damage === 0) {
-      return
+      return this.hp
     }
     // heal
     if (damage < 0) {
       const heal = -damage
       this.hp = Math.min(this.type.hp, this.hp + heal)
-      return
+      return this.hp
     }
 
     // damage
@@ -118,6 +118,7 @@ export default class Unit extends Thing {
       // dead, remove unit
       this.game.removeThing(this)
     }
+    return this.hp
   }
 
   async move(to: Hex) {

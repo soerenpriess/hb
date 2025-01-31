@@ -41,8 +41,8 @@ export default class OpponentAi {
   async tryExecuteUnitAction(unit: Unit, action: (() => Promise<any>) | null, actionName?: string | null) {
     this.update()
     if (action && unit.canPerformAction) {
-      const { id } = this.store.state.game.currenFaction
-      if (actionName) logger.log(id, 'Executing action', actionName)
+      const { name } = this.store.state.game.currenFaction
+      if (actionName) logger.log(name, 'Executing action', actionName)
       await action()
     }
     this.update()

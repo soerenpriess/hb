@@ -34,15 +34,15 @@ export default class MainStore extends Store<IState> {
         levelReached: level + 1,
         currentGame: undefined,
       }, this.save)
-      logger.log("System", "Win", game.currenFaction.id)
-      logger.log("System", "Loose", Array.from(game.factions.values()).filter(f => f.id !== game.currenFaction.id)[0].id)
+      logger.log("System", "Win", game.currenFaction.name)
+      logger.log("System", "Loose", Array.from(game.factions.values()).filter(f => f.id !== game.currenFaction.id)[0].name)
       logger.log("System", "Round" + level.toString(), "End")
       logger.log("System", "Reward", reward.toString())
     } else {
       const { currentGame } = this.state
       const { game, level } = currentGame!
-      logger.log("System", "Win", game.currenFaction.id)
-      logger.log("System", "Loose", Array.from(game.factions.values()).filter(f => f.id !== game.currenFaction.id)[0].id)
+      logger.log("System", "Win", game.currenFaction.name)
+      logger.log("System", "Loose", Array.from(game.factions.values()).filter(f => f.id !== game.currenFaction.id)[0].name)
       logger.log("System", "Round" + level.toString(), "End")
       this.set({ currentGame: undefined })
     }
@@ -68,7 +68,7 @@ export default class MainStore extends Store<IState> {
 
   purchase = (cart: IUnitType[], cost: number) => {
     debug('mainStore: purchased', cart, 'for', cost)
-    logger.log("1", "purchased", cart[0].name)
+    logger.log("Greens", "purchased", cart[0].name)
     this.set({
       money: this.state.money - cost,
       party: [...this.state.party, ...cart],

@@ -5,6 +5,7 @@ import Hex from '../engine/hex'
 import HexMap, { IMap, Terrain } from '../engine/map'
 import { IUnitType } from '../engine/unit'
 import { ILevelDefinition } from './levels'
+import logger from '../ui/utils/logger'
 
 const CLUSTERING_PROBABILITY = .75
 const REC_LIMIT = 100000
@@ -81,6 +82,12 @@ export default function createLevel(
     game.addUnit({ factionId: fa.id, pos: tempPos, type: unit })
   })
 
+  const playerUnits = game.factionUnits[fa.id]
+
+  const playerUnitsTypes = playerUnits.map(u => u.type.name)
+
+  logger.log("System", "PlayerStartUnits", playerUnitsTypes.join(','))
+
   // add enemy units
   def.opponents.forEach((amount, unit) => {
     while (amount > 0) {
@@ -98,6 +105,12 @@ export default function createLevel(
       amount--
     }
   })
+
+  const enemyUnits = game.factionUnits[fb.id]
+
+  const enemyUnitsTypes = enemyUnits.map(u => u.type.name)
+
+  logger.log("System", "EnemyStartUnits", enemyUnitsTypes.join(','))
 
   return game
 }

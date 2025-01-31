@@ -58,9 +58,24 @@ export class UnitAction implements IAction {
     await Promise.all(result.targets.map(async t => {
       const targetUnit = this.game.things.get(t.unitId) as Unit
       if (t.damage) {
-        await targetUnit.takeDamage(t.damage)
+        let hp = await targetUnit.takeDamage(t.damage)
         const targetFaction = Array.from(this.game.factions.values()).filter((f: Faction) => f.id !== this.game.currenFaction.id)[0]
-        logger.log(targetFaction.id, "TakeDamage", targetUnit.type.name)
+
+        if (t.damage < 0) {
+          await logger.log(this.game.currenFaction.name, "Heal", targetUnit.type.name)
+        }
+
+        if (t.damage > 0) {
+          await logger.log(this.game.currenFaction.name, "Attack", targetUnit.type.name)
+          logger.log(targetFaction.name, "TakeDamage", targetUnit.type.name)
+        }
+
+        if (hp <= 0) {
+          await logger.log(targetFaction.name, "Die", targetUnit.type.name)
+          const targetFactionUnits = this.game.factionUnits[targetFaction.id]
+          const targetFactionUnitsTypes = targetFactionUnits.map(u => u.type.name)
+          logger.log(targetFaction.name, "UnitsLeft", targetFactionUnitsTypes.join(','))
+        }
       }
       if (t.status) {
         await targetUnit.alterStatus(t.status.status, t.status.exp)

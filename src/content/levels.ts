@@ -67,8 +67,21 @@ function pickOpponents(value: number, bag: IUnitType[] = []): IUnitType[] {
  * - map_size: Max(Floor(5 + (N / 3)), 10)
  */
 export function generateLevel(number): ILevelDefinition {
-  const enemyValue = STARTING_ENEMY_VALUE + number * 10 // level 1 = 10 + 0 * 10 = 10, level 2 = 10 + 1 * 10 = 20, level 3 = 10 + 2 * 10 = 30, ...
-  const reward = Math.floor(enemyValue * Math.max(20 - number, 1) / 70)
+  /**
+   * enemyValue
+   * STARTING_ENEMY_VALUE ist immer gleich 10
+   * number ist das level, startend bei 0
+   */
+  // const enemyValue = STARTING_ENEMY_VALUE + number * 10 // level 1 = 10 + 0 * 10 = 10, level 2 = 10 + 1 * 10 = 20, level 3 = 10 + 2 * 10 = 30, ...
+  // const reward = Math.floor(enemyValue * Math.max(20 - number, 1) / 70)
+  const enemyValue = STARTING_ENEMY_VALUE + number * 10
+  let reward = 0
+  if (number >= 0 && number < 10) reward = Math.floor((enemyValue) * Math.max(20 - number, 1) / (60 - number))
+  else if (number >= 10 && number <= 20) reward = Math.floor((enemyValue) * Math.max(20 - (number / 1.4), 1) / (60 - number))
+  else reward = Math.floor((enemyValue) * Math.max(20 - (number / 1.7), 1) / (60 - number))
+
+
+
   const mapSize = Math.min(MIN_MAP_SIZE + Math.floor(number / 3), MAX_MAP_SIZE)
   const pits = Math.floor(cellsInMap(mapSize) * 0.2)
 

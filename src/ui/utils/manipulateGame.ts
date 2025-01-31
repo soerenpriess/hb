@@ -60,6 +60,14 @@ class ManipulateGame {
             }
         })
     }
+
+    // public async increaseGoldOfFaction(store: any, faction: string, gold: number): Promise<void> {
+    //     const factions = Array.from(store.factions.values()).filter((f: any) => f.id === faction)
+    //     factions.forEach((f: any) => {
+    //         f.gold += gold
+    //         console.log('gold', f.gold)
+    //     })
+    // }
 }
 
 const manipulateGame = new ManipulateGame()

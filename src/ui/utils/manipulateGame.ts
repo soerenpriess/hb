@@ -148,6 +148,15 @@ class ManipulateGame {
         opponent.abortTurn();
     }
 
+    public async setDamageMultiplyerOnDragon(store: any): Promise<void> {
+        const units = Array.from(store.things.values()).filter((u: any) => u.type.name === 'Dragon')
+        units.forEach((u: any) => {
+            u.damageMultiplyerOnDragon = true
+        })
+    }
+
+
+
 
 
 }

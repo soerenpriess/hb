@@ -37,6 +37,7 @@ export interface IUnitType {
 
 export default class Unit extends Thing {
   kind = 'UNIT'
+  public damageMultiplyerOnDragon: boolean = false;
 
   type: IUnitType
 

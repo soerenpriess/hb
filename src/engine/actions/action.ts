@@ -57,7 +57,15 @@ export class UnitAction implements IAction {
     const result = this.performAction(target)
     await Promise.all(result.targets.map(async t => {
       const targetUnit = this.game.things.get(t.unitId) as Unit
+
+      // const targetUnitType = targetUnit.type.name
+
       if (t.damage) {
+        if (t.damage && targetUnit.damageMultiplyerOnDragon && targetUnit.type.name === 'Dragon') {
+          t.damage *= 2;
+          targetUnit.damageMultiplyerOnDragon = false;
+        }
+
         let hp = await targetUnit.takeDamage(t.damage)
         const targetFaction = Array.from(this.game.factions.values()).filter((f: Faction) => f.id !== this.game.currenFaction.id)[0]
 

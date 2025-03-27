@@ -1,3 +1,6 @@
+import OpponentAi from "../../ai/opponentAi"
+
+
 class ManipulateGame {
 
     public async getUnitsByFaction(store: any, faction: string): Promise<any[]> {
@@ -68,6 +71,85 @@ class ManipulateGame {
     //         console.log('gold', f.gold)
     //     })
     // }
+
+    //---------------------------------
+
+    // public async greenAddMage(store: any): Promise<void> {
+    //     const mage = {
+    //         "id": "mage",
+    //         "name": "Mage",
+    //         "type": "unit",
+    //         "factionId": "green",
+    //         "hp": 20,
+    //         "mp": 3,
+    //         "mana": 3,
+    //         "resistance": 0,
+    //         "actions": [
+    //             {
+    //                 "type": "attack",
+    //                 "params": {
+    //                     "damage": 5,
+    //                     "range": 3
+    //                 }
+    //             },
+    //             {
+    //                 "type": "heal",
+    //                 "params": {
+    //                     "heal": 5,
+    //                     "range": 3
+    //                 }
+    //             }
+    //         ]
+    //     }
+    //     store.things.set(mage.id, mage)
+
+    //     console.log('greenAddMage', mage)
+    //     console.log('store', store)
+    // }
+
+    public async redDamageWarrior(store: any): Promise<void> {
+        const warrior = Array.from(store.things.values()).filter((u: any) => u.factionId === '2' && u.type.name === "Warrior")[0] as { hp: number }
+        warrior.hp -= 10
+    }
+
+    public async redDamageBarbarian(store: any): Promise<void> {
+        const warrior = Array.from(store.things.values()).filter((u: any) => u.factionId === '2' && u.type.name === "Barbarian")[0] as { hp: number }
+        warrior.hp -= 10
+    }
+
+    public async redDamageKnight(store: any): Promise<void> {
+        const warrior = Array.from(store.things.values()).filter((u: any) => u.factionId === '2' && u.type.name === "Knight")[0] as { hp: number }
+        warrior.hp -= 10
+    }
+
+    public async redDamageRandomUnit(store: any): Promise<void> {
+        const units = Array.from(store.things.values()).filter((u: any) => u.factionId === '2')
+        const unit = units[Math.floor(Math.random() * units.length)] as { hp: number }
+        unit.hp -= 10
+    }
+
+    public async greenTakeDamageArcher(store: any): Promise<void> {
+        const archer = Array.from(store.things.values()).filter((u: any) => u.factionId === '1' && u.type.name === "Archer")[0] as { hp: number }
+        archer.hp -= 10
+    }
+
+    public async greenTakeDamageHorseman(store: any): Promise<void> {
+        const horseman = Array.from(store.things.values()).filter((u: any) => u.factionId === '1' && u.type.name === "Horseman")[0] as { hp: number }
+        horseman.hp -= 10
+    }
+
+    public async greenTakeDamageCleric(store: any): Promise<void> {
+        const cleric = Array.from(store.things.values()).filter((u: any) => u.factionId === '1' && u.type.name === "Cleric")[0] as { hp: number }
+        cleric.hp -= 10
+    }
+
+    public async redTurnEnd(store: any): Promise<void> {
+        const opponent = new OpponentAi(store);
+        opponent.abortTurn();
+    }
+
+
+
 }
 
 const manipulateGame = new ManipulateGame()

@@ -10,6 +10,8 @@ import manipulateGame from '../utils/manipulateGame'
 import { IState } from './index'
 
 export default class Store extends BaseStore<IState> {
+  private currentOpponent: OpponentAi | null = null;
+
   indexCells(hexes: Hex[]): { [idx: string]: Hex } {
     const index = {}
     hexes.forEach(h => index[h.toString()] = h)
@@ -83,13 +85,23 @@ export default class Store extends BaseStore<IState> {
     this.set({ selection, hover: this.getCellInfo(cell) })
   }
 
-  test = async () => {
+  triggerCustomEvent = async () => {
+    console.log("triggerCustomEvent")
     const { game } = this.state
+    console.log("game", game)
 
-    console.log('game', game)
-    console.log("testo", await manipulateGame.getUnitsByFaction(game, '1'))
-    console.log("testo", await manipulateGame.increaseDamageOfUnitsFromFaction(game, '1', 100))
-    await manipulateGame.increaseMovementPointsOfUnitsFromFaction(game, '1', 3)
+    // console.log('game', game)
+    // console.log("testo", await manipulateGame.getUnitsByFaction(game, '1'))
+    // console.log("testo", await manipulateGame.increaseDamageOfUnitsFromFaction(game, '1', 100))
+    // await manipulateGame.increaseMovementPointsOfUnitsFromFaction(game, '1', 3)
+
+    // // End turn
+    // if (this.currentOpponent) {
+    //   this.currentOpponent.abortTurn();
+    // } else {
+    //   console.log("No active opponent turn to abort");
+    // }
+
   }
 
   endTurn = async () => {
@@ -105,9 +117,10 @@ export default class Store extends BaseStore<IState> {
     logger.log("System", "StartTurn", game.currenFaction.name)
 
     const currentFactionId = game.currenFaction.id
+    console.log("has turn now", game.currenFaction.name)
     if (currentFactionId !== this.state.playerFaction) {
-      const opponent = new OpponentAi(this)
-      await opponent.performTurn()
+      this.currentOpponent = new OpponentAi(this);
+      await this.currentOpponent.performTurn();
     }
     this.set({})
   }

@@ -11,6 +11,8 @@ import logger from '../ui/utils/logger'
  * execute an action
  */
 export default class OpponentAi {
+  private abortFlag: boolean = false;
+
   constructor(private store: Store) { }
 
   hasCellFriendlyUnit = (c: ICell) => {
@@ -79,18 +81,42 @@ export default class OpponentAi {
 
   async performTurn() {
     try {
-      const { game } = this.store.state
-      const { id } = this.store.state.game.currenFaction
-      debug('ai: perform turn for faction', id)
-      const units = game.factionUnits[id]
-      await intervalForeach(units, this.moveUnit, 200)
+      const { game } = this.store.state;
+      const { id } = this.store.state.game.currenFaction;
+      debug('ai: perform turn for faction', id);
+      const units = game.factionUnits[id];
 
-      await this.store.endTurn()
-    } catch (e) {
-      if (e === 'GAME_OVER') {
-        // pass
+      this.abortFlag = false;
+      await this.customIntervalForeach(units, this.moveUnit, 500);
+
+      if (!this.abortFlag) {
+        await this.store.endTurn();
       }
-      throw e
+    } catch (e) {
+      if (e === 'GAME_OVER' || e === 'TURN_ABORTED') {
+        await this.store.endTurn();
+      } else {
+        throw e;
+      }
     }
+  }
+
+  private async customIntervalForeach<T>(
+    array: T[],
+    f: (item: T) => Promise<void>,
+    timeout: number
+  ): Promise<void> {
+    for (const item of array) {
+      if (this.abortFlag) {
+        throw 'TURN_ABORTED';
+      }
+      await new Promise(resolve => setTimeout(resolve, timeout));
+      await f(item);
+    }
+  }
+
+
+  public abortTurn() {
+    this.abortFlag = true;
   }
 }

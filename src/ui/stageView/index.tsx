@@ -17,6 +17,7 @@ import Sidebar from './sidebar'
 import Store from './store'
 import Things from './things'
 import EventPopup from '../eventPopup'
+// import ActionGlyph from '../components/actionGlyph'
 
 const styles = StyleSheet.create({
   mapContainer: {
@@ -93,7 +94,7 @@ export default class Stageview extends React.Component<IProps, IState> {
     this.setState({ showPopup: true }); // Popup anzeigen
     setTimeout(() => {
       this.setState({ showPopup: false }); // Popup ausblenden
-    }, 2000);
+    }, 4000);
   };
 
   onKeyPress = (e: KeyboardEvent) => {
@@ -172,7 +173,11 @@ export default class Stageview extends React.Component<IProps, IState> {
         <Sidebar store={this.store} />
         <button onClick={this.showPopupFunc}>Show Popup</button>
         {/* EventPopup mit State-Management */}
-        <EventPopup text="Hello World!" visible={this.state.showPopup} />
+        <EventPopup 
+        headerText="Game Event!" 
+        text="Ein zufälliger Archer erhält 3 Schaden!" 
+        visible={this.state.showPopup} 
+      />
       </Screen>
     );
   }

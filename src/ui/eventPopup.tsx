@@ -14,16 +14,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-  text: {
-    fontSize: '2rem',
-    color: '#fff',
+  container: {
     textAlign: 'center',
+  },
+  header: {
+    fontSize: '3rem', // Größerer Text für den Header
+    color: 'red', // Roter Text
+    marginBottom: '1rem', // Abstand zum Haupttext
     animationName: {
       '0%': {
         opacity: 0,
         transform: 'scale(0.8)',
       },
-      '50%': {
+      '25%': {
+        opacity: 1,
+        transform: 'scale(1)',
+      },
+      '75%': {
         opacity: 1,
         transform: 'scale(1)',
       },
@@ -32,24 +39,75 @@ const styles = StyleSheet.create({
         transform: 'scale(0.8)',
       },
     },
-    animationDuration: '2s', // Gesamtdauer der Animation
+    animationDuration: '4s', // Gesamtdauer der Animation
     animationTimingFunction: 'ease-in-out',
-    animationFillMode: 'forwards', // Behalte den letzten Zustand der Animation bei
+    animationFillMode: 'forwards',
+  },
+  text: {
+    fontSize: '2rem',
+    color: '#fff',
+    animationName: {
+      '0%': {
+        opacity: 0,
+        transform: 'scale(0.8)',
+      },
+      '25%': {
+        opacity: 1,
+        transform: 'scale(1)',
+      },
+      '75%': {
+        opacity: 1,
+        transform: 'scale(1)',
+      },
+      '100%': {
+        opacity: 0,
+        transform: 'scale(0.8)',
+      },
+    },
+    animationDuration: '4s', // Gesamtdauer der Animation
+    animationTimingFunction: 'ease-in-out',
+    animationFillMode: 'forwards',
+  },
+  imageContainer: {
+    marginTop: '1rem', // Abstand zum Text
+    animationName: {
+      '0%': {
+        opacity: 0,
+        transform: 'scale(0.8)',
+      },
+      '25%': {
+        opacity: 1,
+        transform: 'scale(1)',
+      },
+      '75%': {
+        opacity: 1,
+        transform: 'scale(1)',
+      },
+      '100%': {
+        opacity: 0,
+        transform: 'scale(0.8)',
+      },
+    },
+    animationDuration: '4s', // Gesamtdauer der Animation
+    animationTimingFunction: 'ease-in-out',
+    animationFillMode: 'forwards',
   },
 });
 
 interface AnimatedModalProps {
-  text: string; // Der anzuzeigende Text
-  visible: boolean; // Steuert die Sichtbarkeit des Modals
+  headerText?: string; // Optionaler Header-Text
+  text?: string; // Haupttext
+  visible?: boolean; // Steuert die Sichtbarkeit des Modals
 }
 
-const EventPopup = ({ text, visible }: AnimatedModalProps) => {
+const EventPopup = ({ headerText, text, visible, imageSrc }: AnimatedModalProps) => {
   if (!visible) return null; // Wenn nicht sichtbar, nichts zurückgeben
 
   return (
     <div className={css(styles.overlay)}>
-      <div className={css(styles.text)}>
-        {text}
+      <div className={css(styles.container)}>
+        {headerText && <div className={css(styles.header)}>{headerText}</div>}
+        {text && <div className={css(styles.text)}>{text}</div>}
       </div>
     </div>
   );

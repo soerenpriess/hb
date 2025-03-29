@@ -6,6 +6,8 @@ const TelegramBot = require('node-telegram-bot-api');
 const token = '8109377544:AAFBr8kOqBDS_dgd95fc2s-So5EkYXzHhfs';
 const bot = new TelegramBot(token, { polling: true });
 
+const manipulateGame = require('./src/ui/utils/manipulateGame.ts');
+
 const app = express();
 const port = 3001;
 
@@ -31,6 +33,13 @@ app.post('/telegram', (req, res) => {
     const chatId = '1741377810'; // Ersetzen Sie dies durch Ihre Chat-ID
     bot.sendMessage(chatId, "Proband benötigt Hilfe in der Testkabine");
 });
+
+app.post('triggerEvent', (req, res) => {
+    // const { event } = req.body;
+    // const chatId = '1741377810'; // Ersetzen Sie dies durch Ihre Chat-ID
+    // bot.sendMessage(chatId, `Trigger Event: ${event}`);
+    manipulateGame.greenAddArcher();
+})
 
 app.listen(port, () => {
     console.log(`Server läuft auf http://localhost:${port}`);

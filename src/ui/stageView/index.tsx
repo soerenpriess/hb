@@ -17,6 +17,7 @@ import Sidebar from './sidebar'
 import Store from './store'
 import Things from './things'
 import EventPopup from '../eventPopup'
+// import {initializeWebSocket} from '../../triggerEvent'
 // import ActionGlyph from '../components/actionGlyph'
 
 const styles = StyleSheet.create({
@@ -28,6 +29,8 @@ const styles = StyleSheet.create({
 export interface IProps {
   store: MainStore,
 }
+
+// initializeWebSocket()
 
 export interface IState {
   playerFaction: string
@@ -61,6 +64,7 @@ export default class Stageview extends React.Component<IProps, IState> {
   store: Store;
 
   constructor(props) {
+    console.log("Stageview constructor")
     super(props);
     const currentGame = this.props.store.state.currentGame!;
 

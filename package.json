@@ -30,6 +30,7 @@
     "webpack-merge": "^4.0.0"
   },
   "dependencies": {
+    "@types/socket.io-client": "^1.4.36",
     "animejs": "^2.0.1",
     "aphrodite": "^1.1.0",
     "color": "^1.0.3",
@@ -38,6 +39,8 @@
     "node-telegram-bot-api": "^0.66.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "store": "^2.0.4"
   }
 }

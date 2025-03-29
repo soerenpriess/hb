@@ -4,6 +4,7 @@ import MainStore, { IState } from './mainStore'
 import MainView from './mainView'
 import StageView from './stageView'
 import style from './utils/style'
+import {initializeWebSocket} from '../triggerEvent'
 
 const styles = StyleSheet.create({
   main: {
@@ -35,6 +36,7 @@ export default class App extends React.Component<{}, IState> {
     super(props)
     this.store = new MainStore(this)
     this.state = this.store.loadProgress()
+    initializeWebSocket(this.store)
   }
 
   // This is just a very basic router based on the store state

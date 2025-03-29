@@ -2,7 +2,6 @@ import OpponentAi from "../../ai/opponentAi"
 import Jump from "../../engine/actions/jump"
 import races from "../../engine/units/races"
 
-
 class ManipulateGame {
 
     public async redDamageWarrior(store: any): Promise<void> {
@@ -76,7 +75,9 @@ class ManipulateGame {
     }
 
     public async greenAddMage(game: any): Promise<void> {
+        console.log('greenAddMage')
 
+        console.log('game', game)
         // get the faction id of the greens
         const greenFractionId = Array.from(game.factions.values() as Iterable<{ name: string; id: string }>).find((f) => f.name === "Greens")
 
@@ -96,7 +97,12 @@ class ManipulateGame {
         }, eligibleCells[0]);
 
 
+        console.log('maxCell', maxCell)
+        console.log('greenFractionId', greenFractionId)
         game.addUnit({ factionId: greenFractionId.id, pos: maxCell.pos, type: races.humans[6] })
+
+        console.log(game)
+
     }
 
     public async greenAddArcher(game: any): Promise<void> {
@@ -123,7 +129,15 @@ class ManipulateGame {
 
         game.addUnit({ factionId: greenFractionId.id, pos: maxCell.pos, type: races.humans[0] })
     }
+
+    public async test(store: any): Promise<void> {
+        console.log("test");
+        console.log("store state:", store.state); // Zugriff auf den State des Stores
+        const game = store.getGame(); // getGame() korrekt aufrufen
+        console.log("game:", game);
+    }
+
 }
 
-const manipulateGame = new ManipulateGame()
-export default manipulateGame
+const manipulateGame = new ManipulateGame(); // Store übergeben
+export default manipulateGame;

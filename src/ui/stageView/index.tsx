@@ -16,6 +16,7 @@ import Overlays from './overlays'
 import Sidebar from './sidebar'
 import Store from './store'
 import Things from './things'
+import EventPopup from '../eventPopup'
 
 const styles = StyleSheet.create({
   mapContainer: {
@@ -30,6 +31,7 @@ export interface IProps {
 export interface IState {
   playerFaction: string
   game: Game,
+  showPopup: boolean // Popup-Status
 
   selection?: {
     cell: ICell,
@@ -54,68 +56,80 @@ export interface IState {
 }
 
 export default class Stageview extends React.Component<IProps, IState> {
-  oldKeyPress: any
-  store: Store
+  oldKeyPress: any;
+  store: Store;
 
   constructor(props) {
-    super(props)
-    const currentGame = this.props.store.state.currentGame!
+    super(props);
+    const currentGame = this.props.store.state.currentGame!;
 
-    this.store = new Store(this)
+    this.store = new Store(this);
     this.state = {
       playerFaction: currentGame.playerFaction,
       game: currentGame.game,
-    }
+      showPopup: false, // Popup-Status in den State verschoben
+      popupText: 'Test', // Popup-Text ebenfalls im State
+    };
   }
 
   componentDidMount() {
-    const map = this.refs.map as SVGAElement
-    const svg = this.refs.svg as SVGAElement
-    const { x, y, width, height } = map.getBBox()
+    const map = this.refs.map as SVGAElement;
+    const svg = this.refs.svg as SVGAElement;
+    const { x, y, width, height } = map.getBBox();
     svg.setAttribute(
-      // tslint:disable-next-line:max-line-length
-      'viewBox', `${x - HEX_SIZE} ${y - HEX_SIZE} ${width + HEX_SIZE * 2} ${height + HEX_SIZE * 2}`,
-    )
-    this.oldKeyPress = document.onkeypress
-    document.onkeypress = this.onKeyPress
-  }
-
-  onKeyPress = (e: KeyboardEvent) => {
-    const { game, playerFaction, selection } = this.state
-    const unit = selection && selection.unit && selection.unit.unit
-    const action = selection && selection.unit && selection.unit.action
-    const int = parseInt(e.key, 10) - 1
-
-    if (e.key === ' ' && !action) {
-      const isAval = u => u.canPerformAction || u.mp > 0
-
-      const playerUnits = game.factionUnits[playerFaction]
-      const currentUnitIndex = playerUnits.findIndex(u =>
-        u.id === (unit && unit.id),
-      )
-      const nextAvailableUnit = playerUnits.find(
-        (u, i) => isAval(u) && i > currentUnitIndex,
-      ) || playerUnits.find(isAval)
-      if (nextAvailableUnit) {
-        this.store.selectCell(game.map.cellAt(nextAvailableUnit.pos))
-        e.preventDefault()
-      }
-    } else if (
-      unit && unit.factionId === playerFaction && unit.actions[int]
-      && unit.canPerformAction
-    ) {
-      this.store.selectAction(unit.actions[int])
-    }
+      'viewBox',
+      `${x - HEX_SIZE} ${y - HEX_SIZE} ${width + HEX_SIZE * 2} ${height + HEX_SIZE * 2}`
+    );
+    this.oldKeyPress = document.onkeypress;
+    document.onkeypress = this.onKeyPress;
   }
 
   componentWillUnmount() {
-    document.onkeypress = this.oldKeyPress
+    document.onkeypress = this.oldKeyPress;
   }
 
+  // Popup anzeigen und nach 2 Sekunden ausblenden
+  showPopupFunc = () => {
+    this.setState({ showPopup: true }); // Popup anzeigen
+    setTimeout(() => {
+      this.setState({ showPopup: false }); // Popup ausblenden
+    }, 2000);
+  };
+
+  onKeyPress = (e: KeyboardEvent) => {
+    const { game, playerFaction, selection } = this.state;
+    const unit = selection && selection.unit && selection.unit.unit;
+    const action = selection && selection.unit && selection.unit.action;
+    const int = parseInt(e.key, 10) - 1;
+
+    if (e.key === ' ' && !action) {
+      const isAval = (u) => u.canPerformAction || u.mp > 0;
+
+      const playerUnits = game.factionUnits[playerFaction];
+      const currentUnitIndex = playerUnits.findIndex(
+        (u) => u.id === (unit && unit.id)
+      );
+      const nextAvailableUnit =
+        playerUnits.find((u, i) => isAval(u) && i > currentUnitIndex) ||
+        playerUnits.find(isAval);
+      if (nextAvailableUnit) {
+        this.store.selectCell(game.map.cellAt(nextAvailableUnit.pos));
+        e.preventDefault();
+      }
+    } else if (
+      unit &&
+      unit.factionId === playerFaction &&
+      unit.actions[int] &&
+      unit.canPerformAction
+    ) {
+      this.store.selectAction(unit.actions[int]);
+    }
+  };
+
   renderGameOver(winningFaction: string) {
-    const { finishGame } = this.props.store
-    const { playerFaction } = this.state
-    const playerWon = winningFaction === playerFaction
+    const { finishGame } = this.props.store;
+    const { playerFaction } = this.state;
+    const playerWon = winningFaction === playerFaction;
 
     return (
       <Dialog>
@@ -129,14 +143,14 @@ export default class Stageview extends React.Component<IProps, IState> {
           </Dialog.Control>
         </Dialog.Controls>
       </Dialog>
-    )
+    );
   }
 
   render() {
-    const winningFaction = this.state.game.checkGameOver()
-    let dialog
+    const winningFaction = this.state.game.checkGameOver();
+    let dialog;
     if (winningFaction) {
-      dialog = this.renderGameOver(winningFaction)
+      dialog = this.renderGameOver(winningFaction);
     }
 
     return (
@@ -146,17 +160,21 @@ export default class Stageview extends React.Component<IProps, IState> {
           <div className={css(styles.mapContainer)}>
             <svg ref="svg" onMouseOut={() => this.store.hover(null)}>
               <g ref="map">
-                <Map store={this.store} /> {/*Map*/}
+                <Map store={this.store} /> {/* Map */}
               </g>
               <g style={{ pointerEvents: 'none' }}>
-                <Overlays store={this.store} /> {/*Angriff zonen oder move zonen*/}
-                <Things store={this.store} /> {/*Einheiten*/}
+                <Overlays store={this.store} /> {/* Angriffszonen oder Move-Zonen */}
+                <Things store={this.store} /> {/* Einheiten */}
               </g>
             </svg>
           </div>
         </Layout>
         <Sidebar store={this.store} />
+        <button onClick={this.showPopupFunc}>Show Popup</button>
+        {/* EventPopup mit State-Management */}
+        <EventPopup text="Hello World!" visible={this.state.showPopup} />
       </Screen>
-    )
+    );
   }
 }
+

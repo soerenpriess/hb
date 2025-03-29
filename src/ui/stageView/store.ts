@@ -102,6 +102,13 @@ export default class Store extends BaseStore<IState> {
     //   console.log("No active opponent turn to abort");
     // }
 
+    // // Dragon Damage Multiplyer
+    // await manipulateGame.setDamageMultiplyerOnDragon(game)
+
+    // jump wildcard
+    // await manipulateGame.setJumpWildcard(game)
+
+    await manipulateGame.greenAddMage(game)
   }
 
   endTurn = async () => {

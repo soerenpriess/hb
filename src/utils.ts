@@ -23,7 +23,7 @@ export async function intervalForeach<T>(
 
 export function debug(message?: any, ...optionalParams: any[]) {
   // tslint:disable-next-line:no-console
-  console.log(message, ...optionalParams)
+  // console.log(message, ...optionalParams)
 }
 
 /**
@@ -37,6 +37,6 @@ export function getItemCircular<T>(array: T[], index: number) {
 /**
  * Object.values functionality
  */
-export function objectValues<T>(o: {[idx: string]: T}): T[] {
+export function objectValues<T>(o: { [idx: string]: T }): T[] {
   return Object.keys(o).map(k => o[k])
 }

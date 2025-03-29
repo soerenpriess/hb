@@ -1,5 +1,6 @@
 import Hex from '../hex'
 import { UnitAction } from './action'
+import manipulateGame from '../../ui/utils/manipulateGame'
 
 export default class Jump extends UnitAction {
   name = 'Jump'
@@ -8,6 +9,7 @@ export default class Jump extends UnitAction {
   params: {}
 
   performAction(target: Hex) {
+    manipulateGame.removeJumpWildcard(this.game)
     return {
       targets: [{
         unitId: this.unit.id, newPosition: target,

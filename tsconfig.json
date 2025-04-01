@@ -6,7 +6,6 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "noUnusedLocals": true,
-    "esModuleInterop": true,
     "lib": [
       "dom",
       "es2015"

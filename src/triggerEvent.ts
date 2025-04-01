@@ -2,6 +2,7 @@ import exp from "constants";
 import io from "socket.io-client";
 import Store from "./ui/stageView/store"
 import manipulateGame from "./ui/utils/manipulateGame";
+import { green } from "color";
 
 // Typ für die Daten, die vom Server gesendet werden
 interface EventData {
@@ -32,9 +33,88 @@ function initializeWebSocket(store: any) {
 }
 
 function getTargetEvent(store, currentQuadrant) {
+    // when player is not in round, do nothing
+    if (!checkIfPlayerIsInRound(store)) return
 
     if (currentQuadrant === "LAHV") {
+        // check if greens have less units than reds
+        if (checkIfGreenHasLessUnitsThanRed(store)) {
+            console.log("Greens have less units than Reds")
+            manipulateGame.greenAddMage(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
+            return
+        }
+        // check if greens have unit archer
+        if (checkIfFractionHasUnit(store, "reds", "Warrior")) {
+            console.log("Reds have unit Warrior")
+            manipulateGame.redDamageWarrior(store.state.currentGame.game);
+            return
+        }
+        // check if greens have unit archer
+        if (checkIfFractionHasUnit(store, "greens", "Archer")) {
+            console.log("Greens have unit Archer")
+            manipulateGame.greenTakeDamageArcher(store.state.currentGame.game);
+            return
+        }
+    }
 
+    if (currentQuadrant === "HALV" || currentQuadrant === "LALV") {
+        // check if greens have unit horseman
+        if (checkIfFractionHasUnit(store, "greens", "Horseman")) {
+            console.log("Greens have unit Horseman")
+            manipulateGame.greenTakeDamageHorseman(store.state.currentGame.game);
+            return
+        }
+
+        // check if reds have unit barbarian
+        if (checkIfFractionHasUnit(store, "reds", "Barbarian")) {
+            console.log("Reds have unit Barbarian")
+            manipulateGame.redDamageBarbarian(store.state.currentGame.game);
+            return
+        }
+
+        // check if reds have unit Knight
+        if (checkIfFractionHasUnit(store, "reds", "Knight")) {
+            console.log("Reds have unit Knight")
+            manipulateGame.redDamageKnight(store.state.currentGame.game);
+            return
+        }
+
+        // check if greens have unit cleric
+        if (checkIfFractionHasUnit(store, "greens", "Cleric")) {
+            console.log("Greens have unit Cleric")
+            manipulateGame.greenTakeDamageCleric(store.state.currentGame.game);
+            return
+        }
+    }
+
+    if (currentQuadrant === "HALV" || currentQuadrant === "LALV" || currentQuadrant === "LAHV") {
+        // check if reds have unit dragon
+        if (checkIfFractionHasUnit(store, "reds", "Dragon")) {
+            console.log("Reds have unit Dragon")
+            manipulateGame.setDamageMultiplyerOnDragon(store.state.currentGame.game);
+            return
+        }
+
+        // check if greens have less units than reds
+        if (checkIfGreenHasLessUnitsThanRed(store)) {
+            console.log("Greens have less units than Reds")
+            manipulateGame.greenAddArcher(store.state.currentGame.game);
+            return
+        }
+
+        // check if reds has turn
+        if (checkIfRedHasTurn(store)) {
+            console.log("Reds has turn")
+            manipulateGame.redTurnEnd(store.state.currentGame.game);
+            return
+        }
+
+        //Fallback
+        manipulateGame.setJumpWildcard(store.state.currentGame.game);
+        manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
+
+        //TODO: Die vektorlänge spielt noch eine rolle. In dem py script die vektorlänge zu dem HAHV quadranten berechnen und dann entsprechend die vektorlänge anpassen
+        // grafiken erstellen für den ablauf und den bedingungen
     }
 
 }
@@ -49,19 +129,23 @@ function checkIfPlayerIsInRound(store) {
     }
 }
 
-function checkIfFractionHasUnit(store, fraction, unit) {
+function checkIfRedHasTurn(store) {
+    return true
+}
+
+function checkIfFractionHasUnit(store, fraction, unitName) {
     const { game } = store.state.currentGame
     const greenFractionId = Array.from(game.factions.values() as Iterable<{ name: string; id: string }>).find((f) => f.name === "Greens")
     const redFractionId = Array.from(game.factions.values() as Iterable<{ name: string; id: string }>).find((f) => f.name === "Reds")
 
     if (fraction === "greens") {
-        const unit = game.factionUnits[greenFractionId.id].find(u => u.type === unit)
+        const unit = game.factionUnits[greenFractionId.id].find(u => u.type.name === unitName)
         if (unit) {
             console.log("Greens have unit", unit)
             return true
         }
     } else if (fraction === "reds") {
-        const unit = game.factionUnits[redFractionId.id].find(u => u.type === unit)
+        const unit = game.factionUnits[redFractionId.id].find(u => u.type.name === unitName)
         if (unit) {
             console.log("Reds have unit", unit)
             return true

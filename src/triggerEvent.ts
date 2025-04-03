@@ -1,8 +1,7 @@
+// import Store from "./ui/stageView/store"
 import exp from "constants";
-import io from "socket.io-client";
-import Store from "./ui/stageView/store"
 import manipulateGame from "./ui/utils/manipulateGame";
-import { green, red } from "color";
+import io from "socket.io-client";
 
 // Typ für die Daten, die vom Server gesendet werden
 interface EventData {
@@ -20,10 +19,7 @@ function initializeWebSocket(store: any) {
         console.log("Event empfangen:", data);
         console.log("Nachricht:", data);
         console.log("store", store);
-        // console.log(store)
-        // manipulateGame.greenAddArcher(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
-        getTargetEvent(store, data); // Beispiel: Füge einen Bogenschützen hinzu
-        alert(data); // Beispiel: Zeige eine Nachricht an
+        getTargetEvent(store, data, 1);
     });
 
     // Aufräumen bei Verbindungsabbruch
@@ -199,243 +195,270 @@ function getTargetEvent(store, currentQuadrant, vectorLength) {
             trigger_HALV_LALV_LAHV_Events(store, vectorLength)
             break;
     }
+}
 
-    function trigger_LAHV_Event(store, vectorLength) {
+function trigger_LAHV_Event(store, vectorLength) {
 
-        switch (vectorLength) {
-            case vectorLength > 1.66:
-                // check if greens have less units than reds
-                if (checkIfGreenHasLessUnitsThanRed(store)) {
-                    console.log("Greens have less units than Reds")
-                    manipulateGame.greenAddMage(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
-                    return
-                }
-                break;
-            case vectorLength > 0.79:
-                // check if red have unit warrior
-                if (checkIfFractionHasUnit(store, "reds", "Warrior")) {
-                    console.log("Reds have unit Warrior")
-                    manipulateGame.redDamageWarrior(store.state.currentGame.game);
-                    return
-                }
-                break;
-            default:
-                // check if greens have unit archer
-                if (checkIfFractionHasUnit(store, "greens", "Archer")) {
-                    console.log("Greens have unit Archer")
-                    manipulateGame.greenTakeDamageArcher(store.state.currentGame.game);
-                    return
-                }
-                break;
-        }
-
-        trigger_HALV_LALV_LAHV_Events(store, vectorLength)
-
-        // if (vectorLength > 1.66) {
-        //     // check if greens have less units than reds
-        //     if (checkIfGreenHasLessUnitsThanRed(store)) {
-        //         console.log("Greens have less units than Reds")
-        //         manipulateGame.greenAddMage(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
-        //         return
-        //     }
-        // }
-
-        // if (vectorLength > 0.79 && vectorLength <= 1.66) {
-        //     // check if red have unit warrior
-        //     if (checkIfFractionHasUnit(store, "reds", "Warrior")) {
-        //         console.log("Reds have unit Warrior")
-        //         manipulateGame.redDamageWarrior(store.state.currentGame.game);
-        //         return
-        //     }
-        // }
-
-        // if (vectorLength >= 0 && vectorLength <= 0.79) {
-        //     // check if greens have unit archer
-        //     if (checkIfFractionHasUnit(store, "greens", "Archer")) {
-        //         console.log("Greens have unit Archer")
-        //         manipulateGame.greenTakeDamageArcher(store.state.currentGame.game);
-        //         return
-        //     }
-        // }
-
-        // // if nothing matches, trigger Fallback event
-        // trigger_HALV_LALV_LAHV_Events(store, vectorLength)
+    switch (vectorLength) {
+        case vectorLength > 1.66:
+            // check if greens have less units than reds
+            if (checkIfGreenHasLessUnitsThanRed(store)) {
+                console.log("Greens have less units than Reds")
+                store.setPopup(true, "Du erhälst einen Magier!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.greenAddMage(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
+                return
+            }
+            break;
+        case vectorLength > 0.79:
+            // check if red have unit warrior
+            if (checkIfFractionHasUnit(store, "reds", "Warrior")) {
+                console.log("Reds have unit Warrior")
+                setTimeout(() => { }, 3000)
+                store.setPopup(true, "Ein Warrior vom Gegner erleidet Schaden!")
+                manipulateGame.redDamageWarrior(store.state.currentGame.game);
+                return
+            }
+            break;
+        default:
+            // check if greens have unit archer
+            if (checkIfFractionHasUnit(store, "greens", "Archer")) {
+                console.log("Greens have unit Archer")
+                store.setPopup(true, "Ein Archer von dir erleidet Schaden!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.greenTakeDamageArcher(store.state.currentGame.game);
+                return
+            }
+            break;
     }
 
-    function trigger_HALV_LALV_Event(store, vectorLength) {
+    trigger_HALV_LALV_LAHV_Events(store, vectorLength)
 
-        switch (vectorLength) {
-            case vectorLength > 1.56:
-                // check if greens have horseman
-                if (checkIfFractionHasUnit(store, "greens", "Horseman")) {
-                    console.log("Greens have unit Horseman")
-                    manipulateGame.greenTakeDamageHorseman(store.state.currentGame.game);
-                    return
-                }
-                break;
-            case vectorLength > 1.11:
-                // check if reds have unit barbarian
-                if (checkIfFractionHasUnit(store, 'reds', 'Barbarian')) {
-                    console.log("Reds have unit Barbarian")
-                    manipulateGame.redDamageBarbarian(store.state.currentGame.game);
-                    return
-                }
-                break;
-            case vectorLength > 0.66:
-                // check if reds have unit knight
-                if (checkIfFractionHasUnit(store, 'reds', 'Knight')) {
-                    console.log("Reds have unit Knight")
-                    manipulateGame.redDamageKnight(store.state.currentGame.game);
-                    return
-                }
-                break;
-            default:
-                // check if greens have unit cleric
-                if (checkIfFractionHasUnit(store, 'greens', 'Cleric')) {
-                    console.log("Greens have unit Cleric")
-                    manipulateGame.greenTakeDamageCleric(store.state.currentGame.game);
-                    return
-                }
-                break;
-        }
+    // if (vectorLength > 1.66) {
+    //     // check if greens have less units than reds
+    //     if (checkIfGreenHasLessUnitsThanRed(store)) {
+    //         console.log("Greens have less units than Reds")
+    //         manipulateGame.greenAddMage(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
+    //         return
+    //     }
+    // }
 
-        trigger_HALV_LALV_LAHV_Events(store, vectorLength)
+    // if (vectorLength > 0.79 && vectorLength <= 1.66) {
+    //     // check if red have unit warrior
+    //     if (checkIfFractionHasUnit(store, "reds", "Warrior")) {
+    //         console.log("Reds have unit Warrior")
+    //         manipulateGame.redDamageWarrior(store.state.currentGame.game);
+    //         return
+    //     }
+    // }
 
-        // if (vectorLength > 1.56) {
-        //     // check if greens have horseman
-        //     if (checkIfFractionHasUnit(store, "greens", "Horseman")) {
-        //         console.log("Greens have unit Horseman")
-        //         manipulateGame.greenTakeDamageHorseman(store.state.currentGame.game);
-        //         return
-        //     }
-        // }
+    // if (vectorLength >= 0 && vectorLength <= 0.79) {
+    //     // check if greens have unit archer
+    //     if (checkIfFractionHasUnit(store, "greens", "Archer")) {
+    //         console.log("Greens have unit Archer")
+    //         manipulateGame.greenTakeDamageArcher(store.state.currentGame.game);
+    //         return
+    //     }
+    // }
 
-        // if (vectorLength > 1.11 && vectorLength <= 1.56) {
-        //     // check if reds have unit barbarian
-        //     if (checkIfFractionHasUnit(store, 'reds', 'Barbarian')) {
-        //         console.log("Reds have unit Barbarian")
-        //         manipulateGame.redDamageBarbarian(store.state.currentGame.game);
-        //         return
-        //     }
-        // }
+    // // if nothing matches, trigger Fallback event
+    // trigger_HALV_LALV_LAHV_Events(store, vectorLength)
+}
 
-        // if (vectorLength > 0.66 && vectorLength <= 1.11) {
-        //     // check if reds have unit knight
-        //     if (checkIfFractionHasUnit(store, 'reds', 'Knight')) {
-        //         console.log("Reds have unit Knight")
-        //         manipulateGame.redDamageKnight(store.state.currentGame.game);
-        //         return
-        //     }
-        // }
+function trigger_HALV_LALV_Event(store, vectorLength) {
 
-        // if (vectorLength >= 0 && vectorLength <= 0.66) {
-        //     // check if greens have unit cleric
-        //     if (checkIfFractionHasUnit(store, 'greens', 'Cleric')) {
-        //         console.log("Greens have unit Cleric")
-        //         manipulateGame.greenTakeDamageCleric(store.state.currentGame.game);
-        //         return
-        //     }
-        // }
-
-        // trigger_HALV_LALV_LAHV_Events(store, vectorLength)
+    switch (vectorLength) {
+        case vectorLength > 1.56:
+            // check if greens have horseman
+            if (checkIfFractionHasUnit(store, "greens", "Horseman")) {
+                console.log("Greens have unit Horseman")
+                store.setPopup(true, "Ein Horseman von dir erleidet Schaden!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.greenTakeDamageHorseman(store.state.currentGame.game);
+                return
+            }
+            break;
+        case vectorLength > 1.11:
+            // check if reds have unit barbarian
+            if (checkIfFractionHasUnit(store, 'reds', 'Barbarian')) {
+                console.log("Reds have unit Barbarian")
+                store.setPopup(true, "Ein Barbarian vom Gegner erleidet Schaden!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.redDamageBarbarian(store.state.currentGame.game);
+                return
+            }
+            break;
+        case vectorLength > 0.66:
+            // check if reds have unit knight
+            if (checkIfFractionHasUnit(store, 'reds', 'Knight')) {
+                console.log("Reds have unit Knight")
+                store.setPopup(true, "Ein Knight vom Gegner erleidet Schaden!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.redDamageKnight(store.state.currentGame.game);
+                return
+            }
+            break;
+        default:
+            // check if greens have unit cleric
+            if (checkIfFractionHasUnit(store, 'greens', 'Cleric')) {
+                console.log("Greens have unit Cleric")
+                store.setPopup(true, "Ein Cleric von dir erleidet Schaden!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.greenTakeDamageCleric(store.state.currentGame.game);
+                return
+            }
+            break;
     }
 
-    function trigger_HALV_LALV_LAHV_Events(store, vectorLength) {
+    trigger_HALV_LALV_LAHV_Events(store, vectorLength)
 
-        switch (vectorLength) {
-            case vectorLength > 1.41:
-                // check if reds have unit dragon
-                if (checkIfFractionHasUnit(store, "reds", "Dragon")) {
-                    console.log("Reds have unit Dragon")
-                    manipulateGame.setDamageMultiplyerOnDragon(store.state.currentGame.game);
-                    return
-                }
-                break;
-            case vectorLength > 0.91:
-                console.log("set Jump Wildcard")
-                manipulateGame.setJumpWildcard(store.state.currentGame.game);
-                return
-            case vectorLength > 0.72:
-                // check if greens have less units than reds
-                if (checkIfGreenHasLessUnitsThanRed(store)) {
-                    console.log("Greens have less units than Reds")
-                    manipulateGame.greenAddArcher(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
-                    return
-                }
-                break;
-            case vectorLength > 0.52:
-                console.log("red damage random unit")
-                manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
-                return
-            default:
-                // check if reds has turn
-                if (checkIfRedHasTurn(store)) {
-                    manipulateGame.redTurnEnd(store.state.currentGame.game);
-                    return
-                }
-                break;
-        }
+    // if (vectorLength > 1.56) {
+    //     // check if greens have horseman
+    //     if (checkIfFractionHasUnit(store, "greens", "Horseman")) {
+    //         console.log("Greens have unit Horseman")
+    //         manipulateGame.greenTakeDamageHorseman(store.state.currentGame.game);
+    //         return
+    //     }
+    // }
 
-        // get Random boolean value
-        const randomValue = Math.floor(Math.random() * 2);
-        if (randomValue === 0) {
+    // if (vectorLength > 1.11 && vectorLength <= 1.56) {
+    //     // check if reds have unit barbarian
+    //     if (checkIfFractionHasUnit(store, 'reds', 'Barbarian')) {
+    //         console.log("Reds have unit Barbarian")
+    //         manipulateGame.redDamageBarbarian(store.state.currentGame.game);
+    //         return
+    //     }
+    // }
+
+    // if (vectorLength > 0.66 && vectorLength <= 1.11) {
+    //     // check if reds have unit knight
+    //     if (checkIfFractionHasUnit(store, 'reds', 'Knight')) {
+    //         console.log("Reds have unit Knight")
+    //         manipulateGame.redDamageKnight(store.state.currentGame.game);
+    //         return
+    //     }
+    // }
+
+    // if (vectorLength >= 0 && vectorLength <= 0.66) {
+    //     // check if greens have unit cleric
+    //     if (checkIfFractionHasUnit(store, 'greens', 'Cleric')) {
+    //         console.log("Greens have unit Cleric")
+    //         manipulateGame.greenTakeDamageCleric(store.state.currentGame.game);
+    //         return
+    //     }
+    // }
+
+    // trigger_HALV_LALV_LAHV_Events(store, vectorLength)
+}
+
+function trigger_HALV_LALV_LAHV_Events(store, vectorLength) {
+
+    switch (vectorLength) {
+        case vectorLength > 1.41:
+            // check if reds have unit dragon
+            if (checkIfFractionHasUnit(store, "reds", "Dragon")) {
+                console.log("Reds have unit Dragon")
+                store.setPopup(true, "Die Einheit Dragon vom Gegner erhält mehr Schaden!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.setDamageMultiplyerOnDragon(store.state.currentGame.game);
+                return
+            }
+            break;
+        case vectorLength > 0.91:
+            console.log("set Jump Wildcard")
             manipulateGame.setJumpWildcard(store.state.currentGame.game);
-        }
-        else {
+            return
+        case vectorLength > 0.72:
+            // check if greens have less units than reds
+            if (checkIfGreenHasLessUnitsThanRed(store)) {
+                console.log("Greens have less units than Reds")
+                store.setPopup(true, "Du erhältst einen Archer!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.greenAddArcher(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
+                return
+            }
+            break;
+        case vectorLength > 0.52:
+            console.log("red damage random unit")
+            store.setPopup(true, "Eine Zufällige Einheit vom Gegner erleidet Schaden!")
+            setTimeout(() => { }, 3000)
             manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
-        }
-
-
-        // if (vectorLength > 1.41) {
-        //     // check if reds have unit dragon
-        //     if (checkIfFractionHasUnit(store, "reds", "Dragon")) {
-        //         console.log("Reds have unit Dragon")
-        //         manipulateGame.setDamageMultiplyerOnDragon(store.state.currentGame.game);
-        //         return
-        //     }
-        // }
-
-        // if (vectorLength > 0.91 && vectorLength <= 1.41) {
-        //     console.log("set Jump Wildcard")
-        //     manipulateGame.setJumpWildcard(store.state.currentGame.game);
-        //     return
-        // }
-
-        // if (vectorLength > 0.72 && vectorLength <= 0.91) {
-        //     // check if greens have less units than reds
-        //     if (checkIfGreenHasLessUnitsThanRed(store)) {
-        //         console.log("Greens have less units than Reds")
-        //         manipulateGame.greenAddArcher(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
-        //         return
-        //     }
-        //     return
-        // }
-
-        // if (vectorLength > 0.52 && vectorLength <= 0.72) {
-        //     console.log("red damage random unit")
-        //     manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
-        //     return
-        // }
-
-        // if (vectorLength >= 0 && vectorLength <= 0.52) {
-        //     // check if reds has turn
-        //     if (checkIfRedHasTurn(store)) {
-        //         manipulateGame.redTurnEnd(store.state.currentGame.game);
-        //     }
-        //     return
-        // }
-
-        // // Final Fallback if nothing matches
-        // // Randomly choose between two actions
-        // // 0 = setJumpWildcard, 1 = redDamageRandomUnit
-        // const randomValue = Math.floor(Math.random() * 2);
-        // if (randomValue === 0) {
-        //     manipulateGame.setJumpWildcard(store.state.currentGame.game);
-        // }
-        // else {
-        //     manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
-        // }
+            return
+        default:
+            // check if reds has turn
+            if (checkIfRedHasTurn(store)) {
+                store.setPopup(true, "Der Gegner beendet vorzeitig seinen Zug!")
+                setTimeout(() => { }, 3000)
+                manipulateGame.redTurnEnd(store.state.currentGame.game);
+                return
+            }
+            break;
     }
+
+    // get Random boolean value
+    const randomValue = Math.floor(Math.random() * 2);
+    if (randomValue === 0) {
+        store.setPopup(true, "Du kannst mit einer Einheit die Aktion 'Jump' ausführen!")
+        setTimeout(() => { }, 3000)
+        manipulateGame.setJumpWildcard(store.state.currentGame.game);
+    }
+    else {
+        store.setPopup(true, "Eine Zufällige Einheit vom Gegner erleidet Schaden!")
+        setTimeout(() => { }, 3000)
+        manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
+    }
+
+
+    // if (vectorLength > 1.41) {
+    //     // check if reds have unit dragon
+    //     if (checkIfFractionHasUnit(store, "reds", "Dragon")) {
+    //         console.log("Reds have unit Dragon")
+    //         manipulateGame.setDamageMultiplyerOnDragon(store.state.currentGame.game);
+    //         return
+    //     }
+    // }
+
+    // if (vectorLength > 0.91 && vectorLength <= 1.41) {
+    //     console.log("set Jump Wildcard")
+    //     manipulateGame.setJumpWildcard(store.state.currentGame.game);
+    //     return
+    // }
+
+    // if (vectorLength > 0.72 && vectorLength <= 0.91) {
+    //     // check if greens have less units than reds
+    //     if (checkIfGreenHasLessUnitsThanRed(store)) {
+    //         console.log("Greens have less units than Reds")
+    //         manipulateGame.greenAddArcher(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
+    //         return
+    //     }
+    //     return
+    // }
+
+    // if (vectorLength > 0.52 && vectorLength <= 0.72) {
+    //     console.log("red damage random unit")
+    //     manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
+    //     return
+    // }
+
+    // if (vectorLength >= 0 && vectorLength <= 0.52) {
+    //     // check if reds has turn
+    //     if (checkIfRedHasTurn(store)) {
+    //         manipulateGame.redTurnEnd(store.state.currentGame.game);
+    //     }
+    //     return
+    // }
+
+    // // Final Fallback if nothing matches
+    // // Randomly choose between two actions
+    // // 0 = setJumpWildcard, 1 = redDamageRandomUnit
+    // const randomValue = Math.floor(Math.random() * 2);
+    // if (randomValue === 0) {
+    //     manipulateGame.setJumpWildcard(store.state.currentGame.game);
+    // }
+    // else {
+    //     manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
+    // }
+}
 
 
 

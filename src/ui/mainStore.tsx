@@ -4,6 +4,7 @@ import Game from '../engine/game'
 import { IUnitType } from '../engine/unit'
 import * as units from '../engine/units'
 import { debug } from '../utils'
+import Stageview from './stageView/index'
 import * as storage from './storage'
 import Store from './utils/Store'
 
@@ -20,9 +21,15 @@ export interface IState {
     playerFaction: string,
     reward: number,
   }
+
+  showPopup: boolean;
+  popUpText: string;
+
 }
 
 export default class MainStore extends Store<IState> {
+  private componentRef: Stageview | null = null;
+
   finishGame = (won: boolean) => {
     if (won) {
       const { money, currentGame } = this.state
@@ -76,14 +83,14 @@ export default class MainStore extends Store<IState> {
     logger.log("System", "MoneyLeft", (this.state.money - cost).toString())
   }
 
-resetProgress = () => {
-  if (confirm("Möchten Sie wirklich Ihren Fortschritt zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.")) {
-    debug('mainStore: resetting progress')
-    logger.log("System", "Game", "ResetProgress")
-    storage.reset()
-    this.set(this.loadProgress())
+  resetProgress = () => {
+    if (confirm("Möchten Sie wirklich Ihren Fortschritt zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.")) {
+      debug('mainStore: resetting progress')
+      logger.log("System", "Game", "ResetProgress")
+      storage.reset()
+      this.set(this.loadProgress())
+    }
   }
-}
 
 
   loadProgress = () => {
@@ -105,4 +112,14 @@ resetProgress = () => {
       levelReached: this.state.levelReached,
     })
   }
-}
+
+  setComponent = (component: Stageview | null) => {
+    this.componentRef = component;
+  }
+
+  setPopup = (show: boolean, text: string) => {
+    if (this.componentRef) {
+      this.componentRef.showPopupFunc(show, text);
+        }
+      }
+  }

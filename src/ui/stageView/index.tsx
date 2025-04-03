@@ -17,8 +17,6 @@ import Sidebar from './sidebar'
 import Store from './store'
 import Things from './things'
 import EventPopup from '../eventPopup'
-// import {initializeWebSocket} from '../../triggerEvent'
-// import ActionGlyph from '../components/actionGlyph'
 
 const styles = StyleSheet.create({
   mapContainer: {
@@ -35,7 +33,6 @@ export interface IProps {
 export interface IState {
   playerFaction: string
   game: Game,
-  showPopup: boolean // Popup-Status
 
   selection?: {
     cell: ICell,
@@ -57,6 +54,9 @@ export interface IState {
       paths: { [idx: string]: Hex },
     },
   }
+
+  popUpText: string
+  showPopup: boolean
 }
 
 export default class Stageview extends React.Component<IProps, IState> {
@@ -72,8 +72,8 @@ export default class Stageview extends React.Component<IProps, IState> {
     this.state = {
       playerFaction: currentGame.playerFaction,
       game: currentGame.game,
-      showPopup: false, // Popup-Status in den State verschoben
-      popupText: 'Test', // Popup-Text ebenfalls im State
+      showPopup: false,
+      popUpText: "",
     };
   }
 
@@ -87,17 +87,21 @@ export default class Stageview extends React.Component<IProps, IState> {
     );
     this.oldKeyPress = document.onkeypress;
     document.onkeypress = this.onKeyPress;
+    this.props.store.setComponent(this);
   }
 
   componentWillUnmount() {
     document.onkeypress = this.oldKeyPress;
+    this.props.store.setComponent(null);
   }
 
   // Popup anzeigen und nach 2 Sekunden ausblenden
-  showPopupFunc = () => {
-    this.setState({ showPopup: true }); // Popup anzeigen
+  showPopupFunc = (visible: boolean, text: string) => {
+    this.setState({ showPopup: visible });
+    this.setState({ popUpText: text });
     setTimeout(() => {
-      this.setState({ showPopup: false }); // Popup ausblenden
+      this.setState({ showPopup: false });
+      this.setState({ popUpText: "" });
     }, 4000);
   };
 
@@ -175,11 +179,11 @@ export default class Stageview extends React.Component<IProps, IState> {
           </div>
         </Layout>
         <Sidebar store={this.store} />
-        <button onClick={this.showPopupFunc}>Show Popup</button>
+        {/* <button onClick={this.showPopupFunc(true, "asdasd")}>{this.state.showPopup}</button> */}
         {/* EventPopup mit State-Management */}
         <EventPopup 
         headerText="Game Event!" 
-        text="Ein zufälliger Archer erhält 3 Schaden!" 
+        text={this.state.popUpText} 
         visible={this.state.showPopup} 
       />
       </Screen>

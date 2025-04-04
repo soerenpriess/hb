@@ -51,6 +51,21 @@ app.post('/log', (req, res) => {
     });
 });
 
+app.post('triggerEventLog', (req, res) => {
+    const { text, timestamp } = req.body;
+    const logEntry = `${text}:${timestamp}\n`;
+    const subject_alias = req.query.subject_alias;
+
+    fs.appendFile(`${subject_alias}_event_trigger_logs.txt`, logEntry, (err) => {
+        if (err) {
+            console.error('Fehler beim Schreiben des Logs:', err);
+            res.status(500).send('Fehler beim Loggen');
+        } else {
+            res.status(200).send('Log erfolgreich gespeichert');
+        }
+    })
+});
+
 // Endpunkt für Telegram-Nachricht
 app.post('/telegram', (req, res) => {
     const chatId = '1741377810'; // Ersetzen Sie dies durch Ihre Chat-ID

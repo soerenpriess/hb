@@ -2,6 +2,9 @@
 import exp from "constants";
 import manipulateGame from "./ui/utils/manipulateGame";
 import io from "socket.io-client";
+import logger from "./ui/utils/logger";
+import { getOpponentAiInstance } from "./ai/globalOpponentAi";
+import OpponentAi from "./ai/opponentAi";
 
 // Typ für die Daten, die vom Server gesendet werden
 interface EventData {
@@ -16,9 +19,6 @@ function initializeWebSocket(store: any) {
 
     // Lauschen auf benutzerdefinierte Ereignisse vom Server
     socket.on("currentQuadrant", (data: EventData) => {
-        console.log("Event empfangen:", data);
-        console.log("Nachricht:", data);
-        console.log("store", store);
         getTargetEvent(store, data, 1);
     });
 
@@ -28,107 +28,21 @@ function initializeWebSocket(store: any) {
     });
 }
 
-// function getTargetEvent(store, currentQuadrant) {
-//     // when player is not in round, do nothing
-//     if (!checkIfPlayerIsInRound(store)) return
-
-//     if (currentQuadrant === "LAHV") {
-//         // check if greens have less units than reds
-//         if (checkIfGreenHasLessUnitsThanRed(store)) {
-//             console.log("Greens have less units than Reds")
-//             manipulateGame.greenAddMage(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
-//             return
-//         }
-//         // check if greens have unit archer
-//         if (checkIfFractionHasUnit(store, "reds", "Warrior")) {
-//             console.log("Reds have unit Warrior")
-//             manipulateGame.redDamageWarrior(store.state.currentGame.game);
-//             return
-//         }
-//         // check if greens have unit archer
-//         if (checkIfFractionHasUnit(store, "greens", "Archer")) {
-//             console.log("Greens have unit Archer")
-//             manipulateGame.greenTakeDamageArcher(store.state.currentGame.game);
-//             return
-//         }
-//     }
-
-//     if (currentQuadrant === "HALV" || currentQuadrant === "LALV") {
-//         // check if greens have unit horseman
-//         if (checkIfFractionHasUnit(store, "greens", "Horseman")) {
-//             console.log("Greens have unit Horseman")
-//             manipulateGame.greenTakeDamageHorseman(store.state.currentGame.game);
-//             return
-//         }
-
-//         // check if reds have unit barbarian
-//         if (checkIfFractionHasUnit(store, "reds", "Barbarian")) {
-//             console.log("Reds have unit Barbarian")
-//             manipulateGame.redDamageBarbarian(store.state.currentGame.game);
-//             return
-//         }
-
-//         // check if reds have unit Knight
-//         if (checkIfFractionHasUnit(store, "reds", "Knight")) {
-//             console.log("Reds have unit Knight")
-//             manipulateGame.redDamageKnight(store.state.currentGame.game);
-//             return
-//         }
-
-//         // check if greens have unit cleric
-//         if (checkIfFractionHasUnit(store, "greens", "Cleric")) {
-//             console.log("Greens have unit Cleric")
-//             manipulateGame.greenTakeDamageCleric(store.state.currentGame.game);
-//             return
-//         }
-//     }
-
-//     if (currentQuadrant === "HALV" || currentQuadrant === "LALV" || currentQuadrant === "LAHV") {
-//         // check if reds have unit dragon
-//         if (checkIfFractionHasUnit(store, "reds", "Dragon")) {
-//             console.log("Reds have unit Dragon")
-//             manipulateGame.setDamageMultiplyerOnDragon(store.state.currentGame.game);
-//             return
-//         }
-
-//         // check if greens have less units than reds
-//         if (checkIfGreenHasLessUnitsThanRed(store)) {
-//             console.log("Greens have less units than Reds")
-//             manipulateGame.greenAddArcher(store.state.currentGame.game);
-//             return
-//         }
-
-//         // check if reds has turn
-//         if (checkIfRedHasTurn(store)) {
-//             console.log("Reds has turn")
-//             manipulateGame.redTurnEnd(store.state.currentGame.game);
-//             return
-//         }
-
-//         //Fallback
-//         manipulateGame.setJumpWildcard(store.state.currentGame.game);
-//         manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
-
-//         //TODO: Die vektorlänge spielt noch eine rolle. In dem py script die vektorlänge zu dem HAHV quadranten berechnen und dann entsprechend die vektorlänge anpassen
-//         // grafiken erstellen für den ablauf und den bedingungen
-//         // Im Paper bezüglich der Startquadranten von den Events, werden einige StartQuadranten genommen, welche defakto nicht passen, aber damit argumentiert wird, dass diese in die richtung zeigen
-//         // nun argumentiere, dass es zwei optionen gibt, entweder kein event auslösen und warten bis ein target quadrant kommt, in welchem ein event zum auslösen ist und so wie es aktuell gemacht wurde
-//     }
-
-// }
-
 function checkIfPlayerIsInRound(store) {
     if (store.state.currentGame.game) {
-        console.log("Player is in round")
         return true
     } else {
-        console.log("Player is not in round")
         return false
     }
 }
 
 function checkIfRedHasTurn(store) {
-    return true
+    const { game } = store.state.currentGame
+    const currentFactionIndex = game.currentFactionIndex
+    if (currentFactionIndex === 1) {
+        return true
+    }
+    return false
 }
 
 function checkIfFractionHasUnit(store, fraction, unitName) {
@@ -139,18 +53,15 @@ function checkIfFractionHasUnit(store, fraction, unitName) {
     if (fraction === "greens") {
         const unit = game.factionUnits[greenFractionId.id].find(u => u.type.name === unitName)
         if (unit) {
-            console.log("Greens have unit", unit)
             return true
         }
     } else if (fraction === "reds") {
         const unit = game.factionUnits[redFractionId.id].find(u => u.type.name === unitName)
         if (unit) {
-            console.log("Reds have unit", unit)
             return true
         }
     }
 
-    console.log("Greens or Reds do not have unit", unit)
     return false
 }
 
@@ -162,7 +73,6 @@ function checkIfGreenHasLessUnitsThanRed(store) {
     const greenUnits = game.factionUnits[greenFractionId.id].length
     const redUnits = game.factionUnits[redFractionId.id].length
 
-    console.log("checkIfGreenHasLessUnitsThanRed", greenUnits < redUnits)
     if (greenUnits < redUnits) {
         return true
     }
@@ -174,24 +84,36 @@ export { initializeWebSocket };
 
 
 function getTargetEvent(store, currentQuadrant, vectorLength) {
+
+    logger.triggerEventLog(`Trigger Event - currentQuadrant ${currentQuadrant} - vectorLength ${vectorLength}`)
     // when player is not in round, do nothing
-    if (!checkIfPlayerIsInRound(store)) return
+    const isPlayerInRound = checkIfPlayerIsInRound(store)
+    logger.triggerEventLog(`Player is in round: ${isPlayerInRound}`)
+    if (!isPlayerInRound) {
+        logger.triggerEventLog("Player is not in round - exit")
+        logger.triggerEventLog("--------------------------")
+        return
+    }
 
     switch (currentQuadrant) {
         case "LAHV":
             // trigger LAHV Event
+            logger.triggerEventLog("Trigger LAHV Event")
             trigger_LAHV_Event(store, vectorLength)
             break;
         case "HALV":
             // trigger HALV Event
+            logger.triggerEventLog("Trigger HALV Event")
             trigger_HALV_LALV_Event(store, vectorLength)
             break;
         case "LALV":
+            logger.triggerEventLog("Trigger LALV Event")
             // trigger HALV or LALV Event
             trigger_HALV_LALV_Event(store, vectorLength)
             break;
         default:
             // trigger HALV, LALV or LAHV Event
+            logger.triggerEventLog("Trigger HALV, LALV or LAHV Event")
             trigger_HALV_LALV_LAHV_Events(store, vectorLength)
             break;
     }
@@ -202,67 +124,47 @@ function trigger_LAHV_Event(store, vectorLength) {
     switch (vectorLength) {
         case vectorLength > 1.66:
             // check if greens have less units than reds
-            if (checkIfGreenHasLessUnitsThanRed(store)) {
-                console.log("Greens have less units than Reds")
+            const hasGreenLessUnits = checkIfGreenHasLessUnitsThanRed(store)
+            logger.triggerEventLog(`Greens have less units than Reds: ${hasGreenLessUnits}`)
+            if (hasGreenLessUnits) {
+                logger.triggerEventLog("Greens get Mage")
                 store.setPopup(true, "Du erhälst einen Magier!")
                 setTimeout(() => { }, 3000)
                 manipulateGame.greenAddMage(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
         case vectorLength > 0.79:
             // check if red have unit warrior
-            if (checkIfFractionHasUnit(store, "reds", "Warrior")) {
-                console.log("Reds have unit Warrior")
+            const hasRedWarrior = checkIfFractionHasUnit(store, "reds", "Warrior")
+            logger.triggerEventLog(`Reds have unit Warrior: ${hasRedWarrior}`)
+            if (hasRedWarrior) {
+                logger.triggerEventLog("Reds damage Warrior")
                 setTimeout(() => { }, 3000)
                 store.setPopup(true, "Ein Warrior vom Gegner erleidet Schaden!")
                 manipulateGame.redDamageWarrior(store.state.currentGame.game);
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
         default:
             // check if greens have unit archer
-            if (checkIfFractionHasUnit(store, "greens", "Archer")) {
-                console.log("Greens have unit Archer")
+            const hasGreenArcher = checkIfFractionHasUnit(store, "greens", "Archer")
+            logger.triggerEventLog(`Greens have unit Archer: ${hasGreenArcher}`)
+            if (hasGreenArcher) {
+                logger.triggerEventLog("Greens damage Archer")
                 store.setPopup(true, "Ein Archer von dir erleidet Schaden!")
                 setTimeout(() => { }, 3000)
                 manipulateGame.greenTakeDamageArcher(store.state.currentGame.game);
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
     }
 
+    logger.triggerEventLog("Fallback from LAHV - Triggering HALV, LALV or LAHV Events")
     trigger_HALV_LALV_LAHV_Events(store, vectorLength)
-
-    // if (vectorLength > 1.66) {
-    //     // check if greens have less units than reds
-    //     if (checkIfGreenHasLessUnitsThanRed(store)) {
-    //         console.log("Greens have less units than Reds")
-    //         manipulateGame.greenAddMage(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
-    //         return
-    //     }
-    // }
-
-    // if (vectorLength > 0.79 && vectorLength <= 1.66) {
-    //     // check if red have unit warrior
-    //     if (checkIfFractionHasUnit(store, "reds", "Warrior")) {
-    //         console.log("Reds have unit Warrior")
-    //         manipulateGame.redDamageWarrior(store.state.currentGame.game);
-    //         return
-    //     }
-    // }
-
-    // if (vectorLength >= 0 && vectorLength <= 0.79) {
-    //     // check if greens have unit archer
-    //     if (checkIfFractionHasUnit(store, "greens", "Archer")) {
-    //         console.log("Greens have unit Archer")
-    //         manipulateGame.greenTakeDamageArcher(store.state.currentGame.game);
-    //         return
-    //     }
-    // }
-
-    // // if nothing matches, trigger Fallback event
-    // trigger_HALV_LALV_LAHV_Events(store, vectorLength)
 }
 
 function trigger_HALV_LALV_Event(store, vectorLength) {
@@ -270,85 +172,61 @@ function trigger_HALV_LALV_Event(store, vectorLength) {
     switch (vectorLength) {
         case vectorLength > 1.56:
             // check if greens have horseman
-            if (checkIfFractionHasUnit(store, "greens", "Horseman")) {
-                console.log("Greens have unit Horseman")
+            const hasGreenHorseman = checkIfFractionHasUnit(store, "greens", "Horseman")
+            logger.triggerEventLog(`Greens have unit Horseman: ${hasGreenHorseman}`)
+            if (hasGreenHorseman) {
+                logger.triggerEventLog("Greens damage Horseman")
                 store.setPopup(true, "Ein Horseman von dir erleidet Schaden!")
                 setTimeout(() => { }, 3000)
                 manipulateGame.greenTakeDamageHorseman(store.state.currentGame.game);
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
         case vectorLength > 1.11:
             // check if reds have unit barbarian
-            if (checkIfFractionHasUnit(store, 'reds', 'Barbarian')) {
-                console.log("Reds have unit Barbarian")
+            const hasRedBarbarian = checkIfFractionHasUnit(store, 'reds', 'Barbarian')
+            logger.triggerEventLog(`Reds have unit Barbarian: ${hasRedBarbarian}`)
+            if (hasRedBarbarian) {
+                logger.triggerEventLog("Reds damage Barbarian")
                 store.setPopup(true, "Ein Barbarian vom Gegner erleidet Schaden!")
                 setTimeout(() => { }, 3000)
                 manipulateGame.redDamageBarbarian(store.state.currentGame.game);
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
         case vectorLength > 0.66:
             // check if reds have unit knight
-            if (checkIfFractionHasUnit(store, 'reds', 'Knight')) {
-                console.log("Reds have unit Knight")
+            const hasRedKnight = checkIfFractionHasUnit(store, 'reds', 'Knight')
+            logger.triggerEventLog(`Reds have unit Knight: ${hasRedKnight}`)
+            if (hasRedKnight) {
+                logger.triggerEventLog("Reds damage Knight")
                 store.setPopup(true, "Ein Knight vom Gegner erleidet Schaden!")
                 setTimeout(() => { }, 3000)
                 manipulateGame.redDamageKnight(store.state.currentGame.game);
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
         default:
             // check if greens have unit cleric
-            if (checkIfFractionHasUnit(store, 'greens', 'Cleric')) {
-                console.log("Greens have unit Cleric")
+            const hasGreenCleric = checkIfFractionHasUnit(store, 'greens', 'Cleric')
+            logger.triggerEventLog(`Greens have unit Cleric: ${hasGreenCleric}`)
+            if (hasGreenCleric) {
+                logger.triggerEventLog("Greens damage Cleric")
                 store.setPopup(true, "Ein Cleric von dir erleidet Schaden!")
                 setTimeout(() => { }, 3000)
                 manipulateGame.greenTakeDamageCleric(store.state.currentGame.game);
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
     }
 
+    logger.triggerEventLog("Fallback from HALV or LALV - Triggering HALV, LALV or LAHV Events")
     trigger_HALV_LALV_LAHV_Events(store, vectorLength)
 
-    // if (vectorLength > 1.56) {
-    //     // check if greens have horseman
-    //     if (checkIfFractionHasUnit(store, "greens", "Horseman")) {
-    //         console.log("Greens have unit Horseman")
-    //         manipulateGame.greenTakeDamageHorseman(store.state.currentGame.game);
-    //         return
-    //     }
-    // }
-
-    // if (vectorLength > 1.11 && vectorLength <= 1.56) {
-    //     // check if reds have unit barbarian
-    //     if (checkIfFractionHasUnit(store, 'reds', 'Barbarian')) {
-    //         console.log("Reds have unit Barbarian")
-    //         manipulateGame.redDamageBarbarian(store.state.currentGame.game);
-    //         return
-    //     }
-    // }
-
-    // if (vectorLength > 0.66 && vectorLength <= 1.11) {
-    //     // check if reds have unit knight
-    //     if (checkIfFractionHasUnit(store, 'reds', 'Knight')) {
-    //         console.log("Reds have unit Knight")
-    //         manipulateGame.redDamageKnight(store.state.currentGame.game);
-    //         return
-    //     }
-    // }
-
-    // if (vectorLength >= 0 && vectorLength <= 0.66) {
-    //     // check if greens have unit cleric
-    //     if (checkIfFractionHasUnit(store, 'greens', 'Cleric')) {
-    //         console.log("Greens have unit Cleric")
-    //         manipulateGame.greenTakeDamageCleric(store.state.currentGame.game);
-    //         return
-    //     }
-    // }
-
-    // trigger_HALV_LALV_LAHV_Events(store, vectorLength)
 }
 
 function trigger_HALV_LALV_LAHV_Events(store, vectorLength) {
@@ -356,108 +234,77 @@ function trigger_HALV_LALV_LAHV_Events(store, vectorLength) {
     switch (vectorLength) {
         case vectorLength > 1.41:
             // check if reds have unit dragon
-            if (checkIfFractionHasUnit(store, "reds", "Dragon")) {
-                console.log("Reds have unit Dragon")
+            const hasRedDragon = checkIfFractionHasUnit(store, "reds", "Dragon")
+            logger.triggerEventLog(`Reds have unit Dragon: ${hasRedDragon}`)
+            if (hasRedDragon) {
+                logger.triggerEventLog("Reds damage Dragon")
                 store.setPopup(true, "Die Einheit Dragon vom Gegner erhält mehr Schaden!")
                 setTimeout(() => { }, 3000)
                 manipulateGame.setDamageMultiplyerOnDragon(store.state.currentGame.game);
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
         case vectorLength > 0.91:
-            console.log("set Jump Wildcard")
+            logger.triggerEventLog("Greens get Jump Wildcard")
+            store.setPopup(true, "Du kannst mit einer Einheit die Aktion 'Jump' ausführen!")
             manipulateGame.setJumpWildcard(store.state.currentGame.game);
+            logger.triggerEventLog("--------------------------")
             return
         case vectorLength > 0.72:
             // check if greens have less units than reds
-            if (checkIfGreenHasLessUnitsThanRed(store)) {
-                console.log("Greens have less units than Reds")
+            const hasGreenLessUnits = checkIfGreenHasLessUnitsThanRed(store)
+            logger.triggerEventLog(`Greens have less units than Reds: ${hasGreenLessUnits}`)
+            if (hasGreenLessUnits) {
+                logger.triggerEventLog("Greens get Archer")
                 store.setPopup(true, "Du erhältst einen Archer!")
                 setTimeout(() => { }, 3000)
                 manipulateGame.greenAddArcher(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
         case vectorLength > 0.52:
-            console.log("red damage random unit")
+            logger.triggerEventLog("Reds random damage unit")
             store.setPopup(true, "Eine Zufällige Einheit vom Gegner erleidet Schaden!")
             setTimeout(() => { }, 3000)
             manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
+            logger.triggerEventLog("--------------------------")
             return
         default:
             // check if reds has turn
-            if (checkIfRedHasTurn(store)) {
+            const hasRedTurn = checkIfRedHasTurn(store)
+            logger.triggerEventLog(`Reds have turn: ${hasRedTurn}`)
+            if (hasRedTurn) {
+                logger.triggerEventLog("Reds turn end")
                 store.setPopup(true, "Der Gegner beendet vorzeitig seinen Zug!")
-                setTimeout(() => { }, 3000)
-                manipulateGame.redTurnEnd(store.state.currentGame.game);
+                const currentOpponent: OpponentAi | null = getOpponentAiInstance();
+                manipulateGame.redTurnEnd(currentOpponent);
+                logger.triggerEventLog("--------------------------")
                 return
             }
             break;
     }
 
+    logger.triggerEventLog("Fallback from HALV, LALV or LAHV - Triggering Jump Wildcard or Random Damage")
     // get Random boolean value
     const randomValue = Math.floor(Math.random() * 2);
     if (randomValue === 0) {
+        logger.triggerEventLog("Greens get Jump Wildcard")
         store.setPopup(true, "Du kannst mit einer Einheit die Aktion 'Jump' ausführen!")
         setTimeout(() => { }, 3000)
         manipulateGame.setJumpWildcard(store.state.currentGame.game);
+        logger.triggerEventLog("--------------------------")
+        return
     }
     else {
+        logger.triggerEventLog("Reds random damage unit")
         store.setPopup(true, "Eine Zufällige Einheit vom Gegner erleidet Schaden!")
         setTimeout(() => { }, 3000)
         manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
+        logger.triggerEventLog("--------------------------")
+        return
     }
-
-
-    // if (vectorLength > 1.41) {
-    //     // check if reds have unit dragon
-    //     if (checkIfFractionHasUnit(store, "reds", "Dragon")) {
-    //         console.log("Reds have unit Dragon")
-    //         manipulateGame.setDamageMultiplyerOnDragon(store.state.currentGame.game);
-    //         return
-    //     }
-    // }
-
-    // if (vectorLength > 0.91 && vectorLength <= 1.41) {
-    //     console.log("set Jump Wildcard")
-    //     manipulateGame.setJumpWildcard(store.state.currentGame.game);
-    //     return
-    // }
-
-    // if (vectorLength > 0.72 && vectorLength <= 0.91) {
-    //     // check if greens have less units than reds
-    //     if (checkIfGreenHasLessUnitsThanRed(store)) {
-    //         console.log("Greens have less units than Reds")
-    //         manipulateGame.greenAddArcher(store.state.currentGame.game); // Beispiel: Füge einen Bogenschützen hinzu
-    //         return
-    //     }
-    //     return
-    // }
-
-    // if (vectorLength > 0.52 && vectorLength <= 0.72) {
-    //     console.log("red damage random unit")
-    //     manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
-    //     return
-    // }
-
-    // if (vectorLength >= 0 && vectorLength <= 0.52) {
-    //     // check if reds has turn
-    //     if (checkIfRedHasTurn(store)) {
-    //         manipulateGame.redTurnEnd(store.state.currentGame.game);
-    //     }
-    //     return
-    // }
-
-    // // Final Fallback if nothing matches
-    // // Randomly choose between two actions
-    // // 0 = setJumpWildcard, 1 = redDamageRandomUnit
-    // const randomValue = Math.floor(Math.random() * 2);
-    // if (randomValue === 0) {
-    //     manipulateGame.setJumpWildcard(store.state.currentGame.game);
-    // }
-    // else {
-    //     manipulateGame.redDamageRandomUnit(store.state.currentGame.game);
-    // }
 }
 
 

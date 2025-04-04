@@ -6,6 +6,7 @@ import Unit from '../../engine/unit'
 import BaseStore from '../utils/Store'
 import logger from '../utils/logger'
 import manipulateGame from '../utils/manipulateGame'
+import { setOpponentAiInstance } from '../../ai/globalOpponentAi'
 
 import { IState } from './index'
 
@@ -86,16 +87,17 @@ export default class Store extends BaseStore<IState> {
   }
 
   triggerCustomEvent = async () => {
-    console.log("triggerCustomEvent")
+    // console.log("triggerCustomEvent")
     const { game } = this.state
-    console.log("game", game)
+    // console.log("game", game)
+
 
     // console.log('game', game)
     // console.log("testo", await manipulateGame.getUnitsByFaction(game, '1'))
     // console.log("testo", await manipulateGame.increaseDamageOfUnitsFromFaction(game, '1', 100))
     // await manipulateGame.increaseMovementPointsOfUnitsFromFaction(game, '1', 3)
 
-    // // End turn
+    // End turn
     // if (this.currentOpponent) {
     //   this.currentOpponent.abortTurn();
     // } else {
@@ -108,7 +110,7 @@ export default class Store extends BaseStore<IState> {
     // jump wildcard
     // await manipulateGame.setJumpWildcard(game)
 
-    await manipulateGame.greenAddMage(game)
+    // await manipulateGame.greenAddMage(game)
   }
 
   endTurn = async () => {
@@ -127,6 +129,7 @@ export default class Store extends BaseStore<IState> {
     console.log("has turn now", game.currenFaction.name)
     if (currentFactionId !== this.state.playerFaction) {
       this.currentOpponent = new OpponentAi(this);
+      setOpponentAiInstance(this.currentOpponent)
       await this.currentOpponent.performTurn();
     }
     this.set({})

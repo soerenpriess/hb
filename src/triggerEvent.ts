@@ -18,8 +18,9 @@ function initializeWebSocket(store: any) {
     console.log("Verbindung zum WebSocket-Server wird hergestellt...");
 
     // Lauschen auf benutzerdefinierte Ereignisse vom Server
-    socket.on("currentQuadrant", (data: EventData) => {
-        getTargetEvent(store, data, 1);
+    socket.on("triggerEvent", (data: EventData) => {
+        console.log("Ereignis empfangen:", data);
+        getTargetEvent(store, data[0], data[1]);
     });
 
     // Aufräumen bei Verbindungsabbruch
@@ -87,6 +88,13 @@ function getTargetEvent(store, currentQuadrant, vectorLength) {
 
     logger.triggerEventLog(`Trigger Event - currentQuadrant ${currentQuadrant} - vectorLength ${vectorLength}`)
     // when player is not in round, do nothing
+
+    if (currentQuadrant === "HAHV") {
+        logger.triggerEventLog("currentQuadrant is HAHV - exit")
+        logger.triggerEventLog("--------------------------")
+        return
+    }
+
     const isPlayerInRound = checkIfPlayerIsInRound(store)
     logger.triggerEventLog(`Player is in round: ${isPlayerInRound}`)
     if (!isPlayerInRound) {

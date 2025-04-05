@@ -51,7 +51,7 @@ app.post('/log', (req, res) => {
     });
 });
 
-app.post('triggerEventLog', (req, res) => {
+app.post('/triggerEventLog', (req, res) => {
     const { text, timestamp } = req.body;
     const logEntry = `${text}:${timestamp}\n`;
     const subject_alias = req.query.subject_alias;
@@ -78,12 +78,14 @@ app.post('/triggerEvent', (req, res) => {
 
     console.log('TriggerEvent-Request:', req.body); // Debug-Ausgabe
 
-    const { currentQuadrant } = req.body;
+    let { currentQuadrant, vectorLength } = req.body;
+
+    vectorLength = parseFloat(vectorLength); // Konvertiere in Ganzzahl
 
     // Ereignis an alle verbundenen Clients senden
-    io.emit("currentQuadrant", currentQuadrant);
+    io.emit("triggerEvent", [currentQuadrant, vectorLength]);
 
-    res.status(200).send(`Event '${currentQuadrant}' wurde getriggert`);
+    res.status(200).send(`Event '${currentQuadrant}' mit der Vectorlänge '${vectorLength}' wurde getriggert`);
 });
 
 // Lauschen auf WebSocket-Verbindungen

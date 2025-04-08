@@ -85,7 +85,6 @@ export function generateLevel(number): ILevelDefinition {
   const mapSize = Math.min(MIN_MAP_SIZE + Math.floor(number / 3), MAX_MAP_SIZE)
   const pits = Math.floor(cellsInMap(mapSize) * 0.2)
 
-  reward = reward * 10
   console.log("generateLevel", {
     "ememyValue": enemyValue,
     "reward": reward,

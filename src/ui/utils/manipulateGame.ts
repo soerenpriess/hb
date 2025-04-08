@@ -5,7 +5,7 @@ import races from "../../engine/units/races"
 class ManipulateGame {
 
     public async redDamageWarrior(store: any): Promise<void> {
-        const warrior = Array.from(store.things.values()).filter((u: any) => u.factionId === '2' && u.type.name === "Warrior")[0] as { hp: number }
+        const warrior = Array.from(store.things.values()).filter((u: any) => u.faction.name === "Reds" && u.type.name === "Warrior")[0] as { hp: number }
         warrior.hp -= 3
 
         //check if unit is dead
@@ -16,7 +16,7 @@ class ManipulateGame {
     }
 
     public async redDamageBarbarian(store: any): Promise<void> {
-        const warrior = Array.from(store.things.values()).filter((u: any) => u.factionId === '2' && u.type.name === "Barbarian")[0] as { hp: number }
+        const warrior = Array.from(store.things.values()).filter((u: any) => u.faction.name === "Reds" && u.type.name === "Barbarian")[0] as { hp: number }
         warrior.hp -= 3
 
         //check if unit is dead
@@ -27,7 +27,7 @@ class ManipulateGame {
     }
 
     public async redDamageKnight(store: any): Promise<void> {
-        const warrior = Array.from(store.things.values()).filter((u: any) => u.factionId === '2' && u.type.name === "Knight")[0] as { hp: number }
+        const warrior = Array.from(store.things.values()).filter((u: any) => u.faction.name === "Reds" && u.type.name === "Knight")[0] as { hp: number }
         warrior.hp -= 6
 
         //check if unit is dead
@@ -38,7 +38,7 @@ class ManipulateGame {
     }
 
     public async redDamageRandomUnit(store: any): Promise<void> {
-        const units = Array.from(store.things.values()).filter((u: any) => u.factionId === '2')
+        const units = Array.from(store.things.values()).filter((u: any) => u.faction.name === "Reds")
         const unit = units[Math.floor(Math.random() * units.length)] as { hp: number }
         unit.hp -= 3
 
@@ -50,7 +50,7 @@ class ManipulateGame {
     }
 
     public async greenTakeDamageArcher(store: any): Promise<void> {
-        const archer = Array.from(store.things.values()).filter((u: any) => u.factionId === '1' && u.type.name === "Archer")[0] as { hp: number }
+        const archer = Array.from(store.things.values()).filter((u: any) => u.faction.name === "Greens" && u.type.name === "Archer")[0] as { hp: number }
         archer.hp -= 3
 
         // check if unit is dead
@@ -61,7 +61,7 @@ class ManipulateGame {
     }
 
     public async greenTakeDamageHorseman(store: any): Promise<void> {
-        const horseman = Array.from(store.things.values()).filter((u: any) => u.factionId === '1' && u.type.name === "Horseman")[0] as { hp: number }
+        const horseman = Array.from(store.things.values()).filter((u: any) => u.faction.name === "Greens" && u.type.name === "Horseman")[0] as { hp: number }
         horseman.hp -= 4
 
         // check if unit is dead
@@ -72,7 +72,7 @@ class ManipulateGame {
     }
 
     public async greenTakeDamageCleric(store: any): Promise<void> {
-        const cleric = Array.from(store.things.values()).filter((u: any) => u.factionId === '1' && u.type.name === "Cleric")[0] as { hp: number }
+        const cleric = Array.from(store.things.values()).filter((u: any) => u.faction.name === "Greens" && u.type.name === "Cleric")[0] as { hp: number }
         cleric.hp -= 2
 
         // check if unit is dead

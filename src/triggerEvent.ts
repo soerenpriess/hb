@@ -30,7 +30,7 @@ function initializeWebSocket(store: any) {
 }
 
 function checkIfPlayerIsInRound(store) {
-    if (store.state.currentGame.game) {
+    if (store.state.currentGame?.game) {
         return true
     } else {
         return false
@@ -159,8 +159,9 @@ function trigger_LAHV_Event(store, vectorLength) {
         default:
             // check if greens have unit archer
             const hasGreenArcher = checkIfFractionHasUnit(store, "greens", "Archer")
+            const hasGreenLessUnits1 = checkIfGreenHasLessUnitsThanRed(store)
             logger.triggerEventLog(`Greens have unit Archer: ${hasGreenArcher}`)
-            if (hasGreenArcher) {
+            if (hasGreenArcher && hasGreenLessUnits1) {
                 logger.triggerEventLog("Greens damage Archer")
                 store.setPopup(true, "Ein Archer von dir erleidet Schaden!")
                 setTimeout(() => { }, 3000)
